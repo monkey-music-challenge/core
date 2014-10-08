@@ -4,7 +4,7 @@
   (case thing
     :playlist 3
     :album 2
-    :track 1))
+    :song 1))
 
 (defn translate [[y x] direction]
   (case direction
