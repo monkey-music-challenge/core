@@ -1,0 +1,16 @@
+{
+  "turns": 5,
+  "layout": [
+    " Up",
+    "Msa"
+  ],
+  "units": {
+    "M": "monkey",
+    "s": "song",
+    "a": "album",
+    "p": "playlist",
+    "U": "user",
+    "#": "wall",
+    " ": "empty"
+  }
+}
