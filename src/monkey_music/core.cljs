@@ -36,3 +36,15 @@
 
 (defn set-score [state player score]
   (assoc-in state [:players player :score] score))
+
+(defn decrease-turns [state]
+  (update-in state [:turns] dec))
+
+(defn set-turns [state turns]
+  (assoc state :turns turns))
+
+(defn game-over? [state]
+  (let [all-units-on-map (flatten (:layout state))
+        all-picked-up-items (flatten (map :picked-up (vals (:players state))))]
+    (not-any? #{:song :album :playlist} (concat all-units-on-map
+                                                all-picked-up-items))))

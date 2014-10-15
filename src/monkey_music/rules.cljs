@@ -2,6 +2,15 @@
   (:require [monkey-music.core :as core]))
 
 (defn move [state player direction]
+  (-> state
+      (exec-move player direction)
+      (core/decrease-turns)
+      (check-game-over)))
+
+(defn check-game-over [state]
+  (if (core/game-over? state) (core/set-turns state 0) state))
+
+(defn exec-move [state player direction]
   (let [player-position (core/player-position state player)
         target-position (core/translate player-position direction)
         unit-at-target-position (core/unit-at state target-position)
@@ -11,18 +20,18 @@
     (case unit-at-target-position
       :empty
       (-> state
-        (core/set-player-position player target-position)
-        (core/set-unit-at target-position :monkey)
-        (core/set-unit-at player-position :empty))
+          (core/set-player-position player target-position)
+          (core/set-unit-at target-position :monkey)
+          (core/set-unit-at player-position :empty))
       (:song :album :playlist)
       (-> state
-        (core/set-picked-up-items player (conj picked-up-items
-                                               unit-at-target-position))
-        (core/set-unit-at target-position :empty))
+          (core/set-picked-up-items player (conj picked-up-items
+                                                 unit-at-target-position))
+          (core/set-unit-at target-position :empty))
       :user
       (-> state
-        (core/set-score player (+ player-score value-of-picked-up-items))
-        (core/set-picked-up-items player []))
+          (core/set-score player (+ player-score value-of-picked-up-items))
+          (core/set-picked-up-items player []))
       state)))
 
 (defn state-for-player [state player]
@@ -55,7 +64,7 @@
 (def test-state
   {:layout [[:empty  :user :playlist]
             [:monkey :song :album]]
-   :turns 5
+   :turns 10
    :players {"player1" {:position [1 0]
                         :score 0
                         :picked-up []}}})
