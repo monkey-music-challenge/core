@@ -1,6 +1,6 @@
 {
   "name": "monkey-music",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Monkey Music",
   "main": "lib/main.js",
   "author": "Oscar Söderlund",
@@ -9,8 +9,7 @@
     "lib": "lib",
     "doc": "doc"
   },
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git://github.com/odsod/monkey-music-cljs"
