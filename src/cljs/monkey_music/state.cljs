@@ -1,6 +1,12 @@
 (ns monkey-music.state
   (:require [monkey-music.core :as core]))
 
+(defn new-player [turns position]
+  {:score 0
+   :picked-up []
+   :turns turns
+   :position position})
+
 (defn new-game-state
   [players {turns "turns"
             layout-strings "layout"

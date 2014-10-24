@@ -10,7 +10,7 @@
     "doc": "doc"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha --no-colors --compilers coffee:coffee-script/register test/coffee"
+    "test": "./node_modules/mocha/bin/mocha --reporter list --growl --watch lib --no-colors --compilers coffee:coffee-script/register test/coffee"
   },
   "repository": {
     "type": "git",
