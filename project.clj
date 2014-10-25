@@ -12,11 +12,11 @@
   :cljsbuild {
     :builds {
       :dev
-      {:source-paths ["src/cljs"]
+      {:source-paths ["src"]
        :compiler {:output-to "lib/main.js"
                   :optimizations :whitespace}}
 
       :prod
-      {:source-paths ["src/cljs"]
+      {:source-paths ["src"]
        :compiler {:output-to "lib/main.js"
                   :optimizations :advanced}}}})

@@ -13,6 +13,12 @@
     :left  [y (dec x)]
     :right [y (inc x)]))
 
+(defn create-player [turns position]
+  {:score 0
+   :picked-up []
+   :turns turns
+   :position position})
+
 (defn unit-at [state position]
   (get-in state (into [:layout] position) :out-of-bounds))
 

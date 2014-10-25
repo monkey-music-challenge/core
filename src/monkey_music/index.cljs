@@ -6,7 +6,8 @@
 (set! *main-cli-fn* (fn []))
 
 (defn new-game-state [players level]
-  (state/new-game-state (js->clj players) (js->clj level)))
+  (state/create (js->clj players)
+                (js->clj level :keywordize-keys true)))
 
 (defn move [state player direction]
   (rules/move state (js->clj player) (keyword direction)))
