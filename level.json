@@ -1,5 +1,6 @@
 {
   "turns": 5,
+  "pickUpLimit": 2,
   "layout": [
     " Up",
     "Msa"
