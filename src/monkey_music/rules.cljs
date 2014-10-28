@@ -20,7 +20,6 @@
   (let [all-the-things (concat (states/all-units state)
                                (states/all-picked-up-items state))
         total-remaining-points (apply value-of all-the-things)]
-    (println (states/total-remaining-turns state))
     (or (zero? (states/total-remaining-turns state))
         (zero? total-remaining-points))))
 
@@ -49,6 +48,8 @@
       state)))
 
 (defn move-player [state player-id direction]
+  (if (not (states/has-player? state player-id))
+    (throw (js/Error. (str "unknown player: " player-id))))
   (if (and (pos? (states/remaining-turns state player-id))
            (not (game-over? state)))
     (-> state

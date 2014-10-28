@@ -6,8 +6,7 @@
     :down  [(inc y) x]
     :left  [y (dec x)]
     :right [y (inc x)]
-    (let [msg (str "unknown direction: " direction)]
-      (throw (js/Error. msg)))))
+    (throw (js/Error. (str "unknown direction: " direction)))))
 
 (defn find-players [layout]
   (let [height (count layout)

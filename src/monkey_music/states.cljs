@@ -4,7 +4,7 @@
 (defn create-player [turns position]
   {:score 0
    :picked-up-items []
-   :turns turns
+   :remaining-turns turns
    :position position})
 
 (defn create-players [player-ids player-positions turns]
@@ -30,6 +30,9 @@
 
 (def player-ids (comp keys :players))
 
+(defn has-player? [state player-id]
+  (contains? (:players state) player-id))
+
 (defn position [state player-id]
   (get-in state [:players player-id :position]))
 
@@ -43,10 +46,10 @@
   (update-in state [:players player-id :score] + amount))
 
 (defn remaining-turns [state player-id]
-  (get-in state [:players player-id :turns]))
+  (get-in state [:players player-id :remaining-turns]))
 
 (defn dec-remaining-turns [state player-id]
-  (update-in state [:players player-id :turns] dec))
+  (update-in state [:players player-id :remaining-turns] dec))
 
 (defn picked-up-items [state player-id]
   (get-in state [:players player-id :picked-up-items]))

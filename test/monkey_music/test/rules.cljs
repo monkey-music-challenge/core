@@ -1,6 +1,6 @@
 (ns monkey-music.test.rules
   (:require-macros [cemerick.cljs.test :refer (deftest is testing)])
-  (:require [cemerick.cljs.test :as t]
+  (:require [cemerick.cljs.test :refer (test-ns)]
             [monkey-music.rules :as rules]))
 
 (deftest test-value-of
@@ -33,24 +33,27 @@
           {:layout [[:empty :empty]
                     [:empty :monkey]]
            :players {"p1" {:picked-up-items []
-                           :turns 3}}})))
+                           :remaining-turns 3}}})))
   (testing "true, because no more turns"
     (is (rules/game-over?
           {:layout [[:empty :song]
                     [:empty :monkey]]
            :players {"p1" {:picked-up-items []
-                           :turns 0}}})))
+                           :remaining-turns 0}}})))
   (testing "false, because remaining items on layout"
     (is (not (rules/game-over?
                {:layout [[:empty :song]
                          [:empty :monkey]]
                 :players {"p1" {:picked-up-items []
-                                :turns 3}}}))))
+                                :remaining-turns 3}}}))))
   (testing "false, because remaining picked up items"
     (is (not (rules/game-over?
                {:layout [[:empty :empty]
                          [:empty :monkey]]
                 :players {"p1" {:picked-up-items [:song]
-                                :turns 3}}})))))
+                                :remaining-turns 3}}})))))
 
-(t/test-ns 'monkey-music.test.rules)
+(deftest test-move-player
+  (testing "unknown player"
+    (is (thrown? js/Error
+                 (rules/move-player {:players {"p1" {}}} "p2" :right)))))

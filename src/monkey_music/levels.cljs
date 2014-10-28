@@ -1,14 +1,14 @@
 (ns monkey-music.levels)
 
+(defn parse-unit [units c]
+  (if (not (contains? units c))
+    (throw (js/Error. (str "unknown unit: " c))))
+  (keyword (units c)))
+
 (defn parse-layout [layout units]
-  (letfn [(parse-unit [c]
-            (if-let [unit (units c)]
-              (keyword unit)
-              (let [msg (str "unknown unit '" c "' in level layout" )]
-                (throw (js/Error. msg)))))]
-    (->> layout
-         (mapv vec)
-         (mapv (partial mapv parse-unit)))))
+  (->> layout
+       (mapv vec)
+       (mapv (partial mapv (partial parse-unit units)))))
 
 (defn parse
   [{units "units"
