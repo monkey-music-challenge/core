@@ -12,18 +12,17 @@
 
   :cljsbuild
   {:builds [{:id "dev"
-             :source-paths ["src/cljs"]
+             :source-paths ["src"]
              :compiler {:output-to "lib/main.js"
                         :optimizations :whitespace}}
 
             {:id "test"
-             :source-paths ["src/cljs" "test/cljs"]
+             :source-paths ["src" "test"]
              :compiler {:output-to "target/testable.js"
-                        :optimizations :simple
-                        :pretty-print true}}
+                        :optimizations :simple}}
 
             {:id "prod"
-             :source-paths ["src/cljs"]
+             :source-paths ["src"]
              :compiler {:output-to "lib/main.js"
                         :optimizations :advanced}}]
 

@@ -49,13 +49,13 @@
   (update-in state [:players player-id :turns] dec))
 
 (defn picked-up-items [state player-id]
-  (get-in state [:players player-id :picked-up]))
+  (get-in state [:players player-id :picked-up-items]))
 
 (defn set-picked-up-items [state player-id items]
-  (assoc-in state [:players player-id :picked-up] items))
+  (assoc-in state [:players player-id :picked-up-items] items))
 
 (defn add-to-picked-up-items [state player-id item]
-  (update-in state [:players player-id :picked-up] conj item))
+  (update-in state [:players player-id :picked-up-items] conj item))
 
 (defn unit-at [state position]
   (get-in state (into [:layout] position) :out-of-bounds))
@@ -72,4 +72,4 @@
   (mapcat (partial picked-up-items state) (player-ids state)))
 
 (defn total-remaining-turns [state]
-  (reduce + (map (partial remaining-turns) (player-ids state))))
+  (reduce + (map (partial remaining-turns state) (player-ids state))))

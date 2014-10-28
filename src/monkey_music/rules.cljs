@@ -20,6 +20,7 @@
   (let [all-the-things (concat (states/all-units state)
                                (states/all-picked-up-items state))
         total-remaining-points (apply value-of all-the-things)]
+    (println (states/total-remaining-turns state))
     (or (zero? (states/total-remaining-turns state))
         (zero? total-remaining-points))))
 
@@ -60,5 +61,5 @@
    :pick-up-limit (states/pick-up-limit state)
    :remaining-turns (states/remaining-turns state player-id)
    :position (states/position state player-id)
-   :score (states/score state player-ids)
+   :score (states/score state player-id)
    :picked-up-items (states/picked-up-items state player-id)})

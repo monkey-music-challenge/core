@@ -1,6 +1,6 @@
 (ns monkey-music.test.positions
   (:require-macros [cemerick.cljs.test :refer (deftest is)])
-  (:require [cemerick.cljs.test]
+  (:require [cemerick.cljs.test :as t]
             [monkey-music.positions :as positions]))
 
 (deftest test-find-players
