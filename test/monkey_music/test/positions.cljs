@@ -30,3 +30,5 @@
     (is (thrown? js/Error (positions/translate [1 1] :not-a-direction))))
   (testing "string direction"
     (is (thrown? js/Error (positions/translate [1 1] "left")))))
+
+;(test-ns 'monkey-music.test.positions)

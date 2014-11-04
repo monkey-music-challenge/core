@@ -66,3 +66,5 @@
            (states/total-remaining-turns
              {:players {"p1" {:remaining-turns 0}
                         "p2" {:remaining-turns 0}}})))))
+
+;(test-ns 'monkey-music.test.states)

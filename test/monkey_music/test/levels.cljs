@@ -4,7 +4,6 @@
             [monkey-music.levels :as levels]))
 
 (deftest test-parse-layout
-
   (testing "valid layout"
     (is (= [[:empty :monkey]
           [:song  :playlist]]
@@ -38,3 +37,5 @@
                       "sa"]
             "pickUpLimit" 3
             "turns" 10}))))
+
+;(test-ns 'monkey-music.test.levels)

@@ -5,19 +5,27 @@
 
 (set! *main-cli-fn* (fn []))
 
-(defn create-state [player-ids level]
-  (states/create player-ids (levels/parse (js->clj level))))
+(defn create-state [teams level]
+  (states/create (js->clj teams) (levels/parse (js->clj level))))
 
-(defn move-player [state player-id direction]
-  (rules/move-player state player-id (keyword direction)))
+(defn run-commands [state commands]
+  (rules/run-commands state (js->clj commands :keywordize-keys true)))
 
 (defn state-for-player [state player-id]
-  (clj->js (rules/state-for-player state player-id)))
+  (let [state (rules/state-for-player state player-id)]
+    (clj->js {"layout" (:layout state)
+              "pickUpLimit" (:pick-up-limit state)
+              "remainingTurns" (:remaining-turns state)
+              "position" (:position state)
+              "score" (:score state)
+              "pickedUpItems" (:picked-up-items state)})))
 
-(defn value-of [item]
-  (rules/value-of (keyword item)))
+(defn value-of [item] (rules/value-of (keyword item)))
 
-(aset js/exports "movePlayer" move-player)
-(aset js/exports "newGameState" create-state)
+(def game-over? rules/game-over?)
+
+(aset js/exports "runCommands" run-commands)
+(aset js/exports "createState" create-state)
 (aset js/exports "stateForPlayer" state-for-player)
 (aset js/exports "valueOf" value-of)
+(aset js/exports "isGameOver" game-over?)

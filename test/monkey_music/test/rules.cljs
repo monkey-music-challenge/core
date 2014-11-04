@@ -57,3 +57,5 @@
   (testing "unknown player"
     (is (thrown? js/Error
                  (rules/move-player {:players {"p1" {}}} "p2" :right)))))
+
+;(test-ns 'monkey-music.test.rules)

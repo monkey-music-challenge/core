@@ -23,6 +23,8 @@
     (or (zero? (states/total-remaining-turns state))
         (zero? total-remaining-points))))
 
+(defn run-commands [state commands] nil)
+
 (defn move-player* [state player-id direction]
   (let [player-position (states/position state player-id)
         target-position (positions/translate player-position direction)
