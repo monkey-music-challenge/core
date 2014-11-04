@@ -23,7 +23,25 @@
     (or (zero? (states/total-remaining-turns state))
         (zero? total-remaining-points))))
 
-(defn run-commands [state commands] nil)
+(defn shuffle-commands [state commands]
+  [state commands])
+
+(defn run-commands [state commands]
+  (let [[state commands] (shuffle-commands state commands)]
+    (reduce run-command state shuffled-commands)))
+
+(defn validate-command [state {command :command team :team}]
+  (if (states/has-team? team) command :noop))
+
+(defmulti run-command validate-command)
+
+(defmethod run-command :move [state {team :team direction :direction}]
+  state)
+
+(defmethod run-command :use [state command]
+  state)
+
+(defmethod run-command :default [state command] state)
 
 (defn move-player* [state player-id direction]
   (let [player-position (states/position state player-id)
