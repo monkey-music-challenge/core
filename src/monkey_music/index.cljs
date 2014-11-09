@@ -1,31 +1,32 @@
 (ns monkey-music.index
   (:require [monkey-music.levels :as levels]
             [monkey-music.rules :as rules]
-            [monkey-music.states :as states]))
+            [monkey-music.units :as units]
+            [monkey-music.commands :as command]
+            [monkey-music.core :as core]))
 
 (set! *main-cli-fn* (fn []))
 
-(defn create-state [teams level]
-  (states/create (js->clj teams) (levels/parse (js->clj level))))
+(defn create-game [team-names level]
+  (core/create-game (js->clj team-names) (levels/parse (js->clj level))))
 
-(defn run-commands [state commands]
-  (rules/run-commands state (js->clj commands :keywordize-keys true)))
+(defn parse-command [command]
+  (commands/parse (js->clj command)))
 
-(defn state-for-player [state player-id]
-  (let [state (rules/state-for-player state player-id)]
-    (clj->js {"layout" (:layout state)
-              "pickUpLimit" (:pick-up-limit state)
-              "remainingTurns" (:remaining-turns state)
-              "position" (:position state)
-              "score" (:score state)
-              "pickedUpItems" (:picked-up-items state)})))
+(defn game-state-for-team [game-state team-name]
+  (let [team-state (rules/game-state-for-team game-state team-name)]
+    (clj->js {"layout" (:layout team-state)
+              "pickUpLimit" (:pick-up-limit team-state)
+              "remainingTurns" (:remaining-turns team-state)
+              "position" (:position team-state)
+              "score" (:score team-state)
+              "pickedUpItems" (units/stringify (:picked-up-items team-state))})))
 
 (defn value-of [item] (rules/value-of (keyword item)))
 
-(def game-over? rules/game-over?)
-
-(aset js/exports "runCommands" run-commands)
-(aset js/exports "createState" create-state)
-(aset js/exports "stateForPlayer" state-for-player)
+(aset js/exports "runCommands" rules/run-commands)
+(aset js/exports "isGameOver" rules/game-over?)
+(aset js/exports "parseCommand" parse-command)
+(aset js/exports "createGame" create-game)
+(aset js/exports "gameStateForTeam" state-for-team)
 (aset js/exports "valueOf" value-of)
-(aset js/exports "isGameOver" game-over?)

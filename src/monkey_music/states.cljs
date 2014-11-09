@@ -1,64 +1,48 @@
 (ns monkey-music.states
-  (:require [monkey-music.positions :as positions]))
+  (:require [monkey-music.positions :as positions]
+            [monkey-music.teams :as teams]
+            [monkey-music.random :as random]))
 
-(defn create-player [turns position]
-  {:score 0
-   :picked-up-items []
-   :remaining-turns turns
-   :position position})
+(defn create [team-names level]
+  {:teams (teams/create-all team-names (positions/find-monkeys (:layout level)))
+   :random (random/create (levels/seed level))
+   :pick-up-limit (:pick-up-limit level)
+   :remaining-turns (:turns level)
+   :layout (:layout level)})
 
-(defn create-players [player-ids player-positions turns]
-  (let [players (mapv (partial create-player turns) player-positions)]
-    (into {} (map vector player-ids players))))
-
-(defn create
-  [player-ids
-   {layout :layout
-    pick-up-limit :pick-up-limit
-    turns :turns}]
-  (let [player-positions (positions/find-players layout)
-        players (create-players player-ids player-positions turns)]
-    {:layout layout
-     :players players
-     :pick-up-limit pick-up-limit}))
-
+(def remaining-turns :remaining-turns)
 (def pick-up-limit :pick-up-limit)
-
+(def team-names (comp keys :teams))
+(def teams (comp vals :teams))
 (def layout :layout)
+(def random :random)
 
-(def players (comp vals :players))
+(defn dec-remaining-turns [state]
+  (update-in state [:remaining-turns] dec))
 
-(def player-ids (comp keys :players))
+(defn has-team? [state team-name]
+  (contains? (:teams state) team-name))
 
-(defn has-player? [state player-id]
-  (contains? (:players state) player-id))
+(defn position [state team-name]
+  (get-in state [:teams team-name :position]))
 
-(defn position [state player-id]
-  (get-in state [:players player-id :position]))
+(defn set-position [state team-name position]
+  (assoc-in state [:teams team-name :position] position))
 
-(defn set-position [state player-id position]
-  (assoc-in state [:players player-id :position] position))
+(defn score [state team-name]
+  (get-in state [:teams team-name :score]))
 
-(defn score [state player-id]
-  (get-in state [:players player-id :score]))
+(defn inc-score [state team-name amount]
+  (update-in state [:teams team-name :score] + amount))
 
-(defn inc-score [state player-id amount]
-  (update-in state [:players player-id :score] + amount))
+(defn picked-up-items [state team-name]
+  (get-in state [:teams team-name :picked-up-items]))
 
-(defn remaining-turns [state player-id]
-  (get-in state [:players player-id :remaining-turns]))
+(defn set-picked-up-items [state team-name items]
+  (assoc-in state [:teams team-name :picked-up-items] items))
 
-(defn dec-remaining-turns [state player-id]
-  (update-in state [:players player-id :remaining-turns] dec))
-
-(defn picked-up-items [state player-id]
-  (get-in state [:players player-id :picked-up-items]))
-
-(defn set-picked-up-items [state player-id items]
-  (assoc-in state [:players player-id :picked-up-items] items))
-
-(defn add-to-picked-up-items [state player-id item]
-  (update-in state [:players player-id :picked-up-items] conj item))
+(defn add-to-picked-up-items [state team-name item]
+  (update-in state [:teams team-name :picked-up-items] conj item))
 
 (defn unit-at [state position]
   (get-in state (into [:layout] position) :out-of-bounds))
@@ -72,7 +56,7 @@
   (flatten (layout state)))
 
 (defn all-picked-up-items [state]
-  (mapcat (partial picked-up-items state) (player-ids state)))
+  (mapcat (partial picked-up-items state) (team-names state)))
 
 (defn total-remaining-turns [state]
-  (reduce + (map (partial remaining-turns state) (player-ids state))))
+  (reduce + (map (partial remaining-turns state) (team-names state))))
