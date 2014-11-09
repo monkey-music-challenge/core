@@ -5,7 +5,7 @@
 (def left ::left)
 (def right ::right)
 
-(def parse [s]
+(defn parse [s]
   (case s
     "up" up
     "down" down

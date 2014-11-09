@@ -1,5 +1,7 @@
 (ns monkey-music.commands
-  (:refer-clojure :exclude [use]))
+  (:refer-clojure :exclude [use])
+  (:require [monkey-music.directions :as directions]
+            [monkey-music.units :as units]))
 
 (def move ::move)
 (def use ::use)

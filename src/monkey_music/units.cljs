@@ -7,11 +7,13 @@
 (def album ::album)
 (def playlist ::playlist)
 (def user ::user)
+(def banana ::banana)
 
 (def item ::item)
 (derive ::song ::item)
 (derive ::album ::item)
 (derive ::playlist ::item)
+(derive ::banana ::item)
 
 (def is? keyword-identical?)
 
@@ -21,9 +23,9 @@
     "monkey" monkey
     "song" song
     "album" album
-    "playlist" playist
+    "playlist" playlist
     "user" user
+    "banana" banana
     (throw (js/Error. (str "not a unit: " s)))))
 
-(defn stringify [units]
-  (if (seq units) (map name units) (name units)))
+(def stringify name)

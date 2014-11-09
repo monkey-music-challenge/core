@@ -1,19 +1,20 @@
 (ns monkey-music.test.levels
   (:require-macros [cemerick.cljs.test :refer (deftest is testing)])
   (:require [cemerick.cljs.test :refer (test-ns)]
-            [monkey-music.levels :as levels]))
+            [monkey-music.levels :as levels]
+            [monkey-music.units :as units]))
 
 (deftest test-parse-layout
   (testing "valid layout"
-    (is (= [[:empty :monkey]
-          [:song  :playlist]]
-         (levels/parse-layout
-           [" M"
-            "sp"]
-           {" " "empty"
-            "s" "song"
-            "p" "playlist"
-            "M" "monkey"}))))
+    (is (= [[units/empty units/monkey]
+            [units/song  units/playlist]]
+           (levels/parse-layout
+             [" M"
+              "sp"]
+             {" " "empty"
+              "s" "song"
+              "p" "playlist"
+              "M" "monkey"}))))
 
   (testing "layout with unknown unit"
     (is (thrown? js/Error
@@ -24,8 +25,8 @@
                     "M" "monkey"})))))
 
 (deftest test-parse
-  (is (= {:layout [[:empty :monkey]
-                   [:song  :album]]
+  (is (= {:layout [[units/empty units/monkey]
+                   [units/song  units/album]]
           :pick-up-limit 3
           :turns 10}
          (levels/parse
@@ -38,4 +39,10 @@
             "pickUpLimit" 3
             "turns" 10}))))
 
-;(test-ns 'monkey-music.test.levels)
+(deftest test-seed
+  (is (= "monkeysongemptyplaylist"
+         (levels/seed
+           {:layout [[units/monkey units/song]
+                     [units/empty units/playlist]]}))))
+
+(test-ns 'monkey-music.test.levels)
