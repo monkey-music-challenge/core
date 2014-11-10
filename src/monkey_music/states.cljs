@@ -1,7 +1,8 @@
 (ns monkey-music.states
   (:require [monkey-music.positions :as positions]
             [monkey-music.teams :as teams]
-            [monkey-music.random :as random]))
+            [monkey-music.random :as random]
+            [monkey-music.levels :as levels]))
 
 (defn create [team-names level]
   {:teams (teams/create-all team-names (positions/find-monkeys (:layout level)))

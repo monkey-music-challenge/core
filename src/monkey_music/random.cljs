@@ -23,6 +23,6 @@
          selected-items []]
     (if (empty? remaining-items)
       selected-items
-      (let [selected-item (weighted-random-selection! remaining-items rng)]
+      (let [selected-item (weighted-selection! remaining-items rng)]
         (recur (dissoc remaining-items selected-item)
                (conj selected-items selected-item))))))

@@ -13,7 +13,7 @@
            (teams/create [0 0])))))
 
 (deftest test-create-all
-  (testing "create all teams"
+  (testing "create multiple teams"
     (is (= {"team1" {:position [0 0]
                      :buffs (buffs/create)
                      :picked-up-items []
@@ -22,6 +22,11 @@
                       :buffs (buffs/create)
                       :picked-up-items []
                       :score 0}}
-           (teams/create-all ["team1" "team17"] [[0 0] [1 1]])))))
+           (teams/create-all ["team1" "team17"]
+                             [[0 0] [1 1]]))))
+  
+  (testing "create duplicate teams"
+    (is (thrown? js/Error (teams/create-all ["team1" "team17" "team1"]
+                                            [[0 0] [1 1] [2 2]])))))
 
-(test-ns 'monkey-music.test.teams)
+;(test-ns 'monkey-music.test.teams)

@@ -36,4 +36,4 @@
              {:key1 0.5 :key2 0.5}
              (random/create "seed"))))))
 
-;(test-ns 'monkey-music.test.random)
+(test-ns 'monkey-music.test.random)
