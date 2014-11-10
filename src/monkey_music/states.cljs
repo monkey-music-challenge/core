@@ -2,6 +2,7 @@
   (:require [monkey-music.positions :as positions]
             [monkey-music.teams :as teams]
             [monkey-music.random :as random]
+            [monkey-music.units :as units]
             [monkey-music.levels :as levels]))
 
 (defn create [team-names level]
@@ -46,7 +47,7 @@
   (update-in state [:teams team-name :picked-up-items] conj item))
 
 (defn unit-at [state position]
-  (get-in state (into [:layout] position) :out-of-bounds))
+  (get-in state (into [:layout] position) units/out-of-bounds))
 
 (defn set-unit-at [state position unit]
   (assoc-in state (into [:layout] position) unit))

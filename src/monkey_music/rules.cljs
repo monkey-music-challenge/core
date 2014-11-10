@@ -1,5 +1,5 @@
 (ns monkey-music.rules
-  (:require [monkey-music.core :as core]
+  (:require [monkey-music.states :as states]
             [monkey-music.positions :as positions]
             [monkey-music.commands :as commands]))
 
@@ -16,14 +16,14 @@
     (value-of* items)))
 
 (defn can-pick-up-more? [state team-name]
-  (< (count (core/picked-up-items state team-name))
-     (core/pick-up-limit state)))
+  (< (count (states/picked-up-items state team-name))
+     (states/pick-up-limit state)))
 
 (defn game-over? [state]
-  (let [all-the-things (concat (core/all-units state)
-                               (core/all-picked-up-items state))
+  (let [all-the-things (concat (states/all-units state)
+                               (states/all-picked-up-items state))
         total-remaining-points (value-of all-the-things)]
-    (or (zero? (core/total-remaining-turns state))
+    (or (zero? (states/total-remaining-turns state))
         (zero? total-remaining-points))))
 
 (defn shuffle-commands [state commands]
@@ -36,13 +36,13 @@
   (if (game-over? state)
     (throw (js/Error. "the game is over")))
   (-> state
-      core/dec-remaining-turns
+      states/dec-remaining-turns
       (shuffle-and-run-commands commands)
       (update-buffs))
   state)
 
 (defn validate-command [state {command :command team-name :team}]
-  (if (core/has-team? state team-name) command :noop))
+  (if (states/has-team? state team-name) command :noop))
 
 (defmulti run-command validate-command)
 
@@ -52,15 +52,15 @@
 (defn pick-up-item [state team-name item item-position]
   (if (can-pick-up-more? state team-name)
     (-> state
-        (core/add-to-picked-up-items team-name item)
-        (core/set-unit-at item-position :empty))
+        (states/add-to-picked-up-items team-name item)
+        (states/set-unit-at item-position :empty))
     state))
 
 (defn unit-at-target [state {team-name :team direction :direction}]
   nil)
 
 (defn command-dispatcher [state {command :command team-name :team direction :direction}]
-  (if (core/has-team? state team-name)
+  (if (states/has-team? state team-name)
     )
   (case command
     :move [:move (unit-at-target-position state team-name direction)]
@@ -80,9 +80,9 @@
 (defmethod run-command [commands/move units/empty]
   [state {team-name :team direction :direction}]
   (-> state
-      (core/set-unit-at (core/team-position state team-name) :empty)
-      (core/set-unit-at target-position :monkey)
-      (core/set-position team-name target-position)))
+      (states/set-unit-at (states/team-position state team-name) :empty)
+      (states/set-unit-at target-position :monkey)
+      (states/set-position team-name target-position)))
 
 (defmethod run-command [commands/move units/item]
   [state {team-name :team direction :direction}]
@@ -91,13 +91,13 @@
 (defmethod run-command [commands/move units/user]
   [state {team-name :team direction :direction}]
   (-> state
-          (core/inc-score team-name value-of-picked-up-items)
-          (core/set-picked-up-items team-name [])))
+          (states/inc-score team-name value-of-picked-up-items)
+          (states/set-picked-up-items team-name [])))
 
 (defn state-for-team [game-state team-name]
-  {:layout (core/layout state)
-   :pick-up-limit (core/pick-up-limit state)
-   :remaining-turns (core/remaining-turns state)
-   :position (core/position state team-name)
-   :score (core/score state team-name)
-   :picked-up-items (core/picked-up-items state team-name)})
+  {:layout (states/layout state)
+   :pick-up-limit (states/pick-up-limit state)
+   :remaining-turns (states/remaining-turns state)
+   :position (states/position state team-name)
+   :score (states/score state team-name)
+   :picked-up-items (states/picked-up-items state team-name)})

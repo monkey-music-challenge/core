@@ -8,6 +8,7 @@
 (def playlist ::playlist)
 (def user ::user)
 (def banana ::banana)
+(def out-of-bounds ::out-of-bounds)
 
 (def item ::item)
 (derive ::song ::item)
