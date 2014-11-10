@@ -16,4 +16,4 @@
     (is (thrown? js/Error
                  (directions/parse "nope")))))
 
-(test-ns 'monkey-music.test.directions)
+;(test-ns 'monkey-music.test.directions)

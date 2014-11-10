@@ -39,4 +39,4 @@
                    (commands/parse {"command" "use"
                                     "item" "nope"})))))
 
-(test-ns 'monkey-music.test.commands)
+;(test-ns 'monkey-music.test.commands)

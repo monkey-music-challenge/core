@@ -3,7 +3,7 @@
             [monkey-music.directions :as directions]))
 
 (defn translate [[y x] direction]
-  (case direction
+  (condp = direction
     directions/up [(dec y) x]
     directions/down [(inc y) x]
     directions/left [y (dec x)]
