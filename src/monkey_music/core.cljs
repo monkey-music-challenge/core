@@ -3,24 +3,7 @@
 
 (defn throw-error [& msgs] (throw (js/Error. (apply str msgs))))
 
-;; Parsing
-
-(defn json->unit [unit-lookup unit-token]
-  (if-let [unit (unit-lookup unit-token)]
-    (keyword "monkey-music.core" unit)
-    (throw-error "unknown unit: " unit-token)))
-
-(defn json->layout [layout unit-lookup]
-  (->> layout
-       (mapv vec)
-       (mapv (partial mapv (partial json->unit unit-lookup)))))
-
-(defn json->level [{:strs units turns layout pickUpLimit}]
-  {:layout (json->layout layout units)
-   :pick-up-limit pickUpLimit
-   :turns turns})
-
-;; Units - can exist on the map
+;; Entities - can exist on the map
 
 (derive ::empty ::unit)
 (derive ::song ::unit)
@@ -32,10 +15,23 @@
 (derive ::open-door ::unit)
 (derive ::closed-door ::unit)
 
+;; Tunnels
+
+(derive ::tunnel-entrance-1 ::tunnel-entrance)
+(derive ::tunnel-exit-1 ::tunnel-exit)
+
+(def exit-for
+  {::tunnel-entrance-1 ::tunnel-exit-1})
+
+;; Entities that can be moved to 
+
+(derive ::empty ::movable-to)
+(derive ::open-door ::movable-to)
+
 ;; Items - can be picked up
 
-(derive ::usable ::item)
-(derive ::valuable ::item)
+(derive ::usable ::pick-upable)
+(derive ::valuable ::pick-upable)
 
 ;; Usables - can be used
 
@@ -47,15 +43,10 @@
 (derive ::album ::valuable)
 (derive ::playlist ::valuable)
 
-(defn value-of [valuable]
-  (case valuable
-    ::song 1
-    ::album 2
-    ::playlist 4
-    0))
-
-(defn json->unit [unit]
-  (keyword "monkey-music.core" unit))
+(def value-of
+  {::song 1
+   ::album 2
+   ::playlist 4})
 
 ;; Buffs
 
@@ -64,9 +55,9 @@
 (derive ::speedy ::buff)
 
 (def buff-duration
-  {::speedy 4}
-  {::tackled 2}
-  {::asleep 3})
+  {::speedy 4
+   ::tackled 2
+   ::asleep 3})
 
 ;; Immobilized - cannot run any commands
 
@@ -118,58 +109,34 @@
   (let [teams (map create-team monkey-positions)]
     (into {} (map vector team-names teams))))
 
-(defn team->json [{:keys [position buffs picked-up-items score]}]
-  {"buffs" (into {} (for [buff remaining-turns] [(name buff) remaining-turns]))
-   "position" position
-   "pickedUpItems" picked-up-items
-   "score" score})
-
 ;; Game states
 
 (defn seed [level]
   (apply str (mapcat (partial map name) (:layout level))))
 
 (defn create-game-state
-  [team-names {layout :layout
-               pick-up-limit :pick-up-limit
-               turns :turns}]
-  {:teams (create-teams team-names (find-all layout ::monkey))
+  [team-names {:keys [layout pick-up-limit turns starting-positions]}]
+  {:teams (create-teams team-names starting-positions)
    :random (random/create (seed level))
    :pick-up-limit pick-up-limit
    :remaining-turns turns
-   :layout layout})
-
-(defn game-state-for-team->json
-  [{:keys [layout pick-up-limit remaining-turns teams]} team-name]
-  (merge
-    {"layout" layout
-     "pickUpLimit" pick-up-limit
-     "remainingTurns" remaining-turns}
-    (team->json (teams team-name))))
+   :layout layout
+   :original-layout layout})
 
 (defn game-over? [state]
   nil)
 
 ;; Commands
 
-(defn json->command [{:strs [command team] :as json-command}]
-  (let [base-command {:command-name command :team-name team}]
-    (case command
-      "move"
-      (if-let [{:strs [direction]} json-command]
-        (merge base-command {:direction (keyword direction)})
-        (throw-error "missing direction"))
-      "use"
-      (if-let [{:strs [item]} json-command]
-        (merge base-command {:item (json->unit item)})))))
-
 (defn peek-move [state team-name direction]
   (let [at-position (get-in state [:teams team-name :position])
         to-position (translate at-position direction)
-        to-unit (get-in state (into [:layout] to-position) ::out-of-bounds)]
+        to-unit (get-in state (into [:layout] to-position) ::out-of-bounds)
+        original-at-unit (get-in state (into [:original-layout] at-position))]
     {:at-position at-position
      :to-position to-position
-     :to-unit to-unit}))
+     :to-unit to-unit
+     :original-at-unit original-at-unit}))
 
 (defn shuffle-commands [{:keys [random]} commands]
   (let [weights (range (count commands) 0 -1)]
@@ -181,39 +148,65 @@
       (update-in [:remaining-turns] dec)
       tick-all-buffs))
 
-(defmulti run-command
-  (fn [state {:keys [command-name team-name] :as command}]
-    (if-not (get-in state [:teams team-name])
-      (throw-error "no such team: " team-name))
-    (case command-name
-      "move"
-      (let [{:keys [direction]} command
-            {:keys [to-unit]} (peek-move state team-name direction)]
-        [:move ::empty]))))
+(defn find-positions [layout pred & args]
+  (for [[y row] (map-indexed vector layout)
+        [x unit] (map-indexed vector row)
+        :when (apply pred unit args)]
+    [y x]))
 
-(defmethod run-command [:use ::banana]
-  [state {team-name :team}]
-  (assoc-in state [:teams team-name :buffs ::speedy] (::speedy buff-duration)))
-
-(defmethod run-command [:move ::empty]
-  [state {:keys [team-name direction]}]
-  (let [{:keys [at-position to-position]} (peek-move state team-name direction)]
+(defn move-team [state team-name to-position]
+  (let [at-position (get-in state [:teams team-name :position])
+        original-at-unit (get-in state (into [:original-layout] at-position))
+        new-at-unit (if-not (isa? original-at-unit ::pick-upable)
+                      original-at-unit ::empty)]
     (-> state
-        (assoc-in (into [:layout] at-position) ::empty)
+        (assoc-in (into [:layout] at-position) new-at-unit)
         (assoc-in (into [:layout] to-position) ::monkey)
         (assoc-in [:teams team-name :position] to-position))))
 
-(defmethod run-command [:move ::item]
-  [state {team-name :team direction :direction}]
+(defmulti run-command (fn [state {:keys [command-name team-name] :as command}]
+  (if-not (get-in state [:teams team-name])
+    (throw-error "no such team: " team-name))
+  (case command-name
+    "move"
+    (let [{:keys [direction]} command
+          {:keys [to-unit]} (peek-move state team-name direction)]
+      [:move to-unit]))))
+
+(defmethod run-command [:move ::movable-to]
+  [state {:keys [team-name direction]}]
+  (let [{:keys [to-position]} (peek-move state team-name direction)]
+    (move-team state team-name to-position)))
+
+(defmethod run-command [:move ::user]
+  [state {:keys [team-name]}]
+  (let [items (get-in state [:teams team-name :picked-up-items])
+        valuables (filter #(isa? % ::valuable) items)
+        non-valuables (filter #(not (isa? % ::valuable)) items)
+        total-value (reduce + (map value-of valuables))]
+    (-> state
+        (update-in [:teams team-name :score] + total-value)
+        (assoc-in [:teams team-name :picked-up-items] non-valuables))))
+
+(defmethod run-command [:move ::pick-upable]
+  [state {:keys [team-name direction]}]
   (let [{:keys [to-position to-unit]} (peek-move state team-name direction)]
     (-> state
         (assoc-in (into [:layout] to-position) ::empty)
         (update-in [:teams team-name :picked-up-items] conj to-unit))))
 
-(defmethod run-command [:move ::user]
+(defmethod run-command [:move ::tunnel-entrance]
+  [{:keys [original-layout] :as state}
+   {:keys [team-name direction] :as command}]
+  (let [{:keys [to-unit]} (peek-move state team-name direction)
+        exit (exit-for to-unit)
+        exit-position (first (find-positions original-layout = exit))
+        unit-at-exit-position (get-in state (into [:layout] exit-position))
+        exit-is-blocked (not (isa? unit-at-exit-position ::tunnel-exit))]
+    (if-not exit-is-blocked
+      (move-team state team-name tunnel-exit-position)
+      state)))
+
+(defmethod run-command [:use ::banana]
   [state {team-name :team}]
-  (let [picked-up-items (get-in state [:teams team-name :picked-up-items])
-        score-update (reduce + (map value-of picked-up-items))]
-    (-> state
-        (update-in [:teams team-name :score] + score-update)
-        (assoc-in [:teams team-name :picked-up-items] []))))
+  (assoc-in state [:teams team-name :buffs ::speedy] (::speedy buff-duration)))
