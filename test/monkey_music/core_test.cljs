@@ -47,21 +47,19 @@
           :teams {"1" {:position [0 0]}}})))
 
 (deftest test-tackle-monkey
-  (is (= (dissoc
+  (is (= (with-redefs [r/weighted-selection! (constantly true)]
            (c/run-command
               {:layout [[::c/monkey ::c/monkey ::c/empty]]
                :original-layout [[::c/empty ::c/empty ::c/empty]]
-               :random (r/create "seed")
+               :random :mock
                :teams {"1" {:position [0 0]}
                        "2" {:position [0 1]}}}
-              {:team-name "1" :command-name "move" :direction :right})
-           :random)
-         (dissoc
+              {:team-name "1" :command-name "move" :direction :right}))
            {:layout [[::c/empty ::c/monkey ::c/monkey]]
             :original-layout [[::c/empty ::c/empty ::c/empty]]
+            :random :mock
             :teams {"1" {:position [0 1]}
-                    "2" {:position [0 2] :buffs {::c/tackled 2}}}}
-           :random))))
+                    "2" {:position [0 2] :buffs {::c/tackled 2}}}})))
 
 (deftest test-pick-up-item
   (is (= {:layout [[::c/monkey ::c/empty]]
