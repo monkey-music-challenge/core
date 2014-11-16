@@ -3,10 +3,12 @@
   (:require [cemerick.cljs.test :refer (test-ns)]
             [monkey-music.index :as i]))
 
-(def left-1 (i/parse-command {"command" "move" "team" "1" "direction" "left"}))
-(def right-1 (i/parse-command {"command" "move" "team" "1" "direction" "right"}))
-(def up-1 (i/parse-command {"command" "move" "team" "1" "direction" "up"}))
-(def down-1 (i/parse-command {"command" "move" "team" "1" "direction" "down"}))
+(def l (i/parse-command {"command" "move" "team" "1" "direction" "left"}))
+(def r (i/parse-command {"command" "move" "team" "1" "direction" "right"}))
+(def u (i/parse-command {"command" "move" "team" "1" "direction" "up"}))
+(def d (i/parse-command {"command" "move" "team" "1" "direction" "down"}))
+
+(def use-banana (i/parse-command {"command" "use" "team" "1" "item" "banana"}))
 
 (def level
   {"layout" ["m  #b"
@@ -26,7 +28,6 @@
 (def state (i/create-game-state ["1"] level))
 
 (-> state
-    (i/run-commands [right-1])
-    (i/run-commands [right-1]))
+    (i/run-commands [r r d r r u use-banana]))
 
 (test-ns 'monkey-music.commands-test)

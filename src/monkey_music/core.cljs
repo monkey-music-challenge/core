@@ -188,13 +188,18 @@
         (assoc-in [:teams team-name :position] to-position))))
 
 (defmulti run-command (fn [{:keys [teams] :as state} {:keys [command-name team-name] :as command}]
-  (if-not (contains? teams team-name)
+  (println "dispatch" command)
+  (when-not (contains? teams team-name)
+    (println "run-command-dispatch" command)
     (throw-error "no such team: " team-name))
   (case command-name
     "move"
     (let [{:keys [direction]} command
           {:keys [to-unit] :as peek1} (peek-move state team-name direction)]
-      [:move to-unit]))))
+      [:move to-unit])
+    "use"
+    (let [{:keys [item]} command]
+      [:use item]))))
 
 (defmethod run-command [:move ::movable-to]
   [state {:keys [team-name direction]}]
