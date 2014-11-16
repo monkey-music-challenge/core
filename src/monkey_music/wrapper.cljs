@@ -1,18 +1,20 @@
 (ns monkey-music.wrapper
   (:require [monkey-music.core :as c]))
 
+(defn throw-error [& msgs] (throw (js/Error. (apply str msgs))))
+
 (defn str->unit [s]
   (let [unit (keyword "monkey-music.core" s)]
     (if (isa? unit ::c/unit) unit (throw-error "not a unit " s))))
 
 (defn str->item [s]
   (let [item (keyword "monkey-music.core" s)]
-    (if (isa? item ::c/usable) item (c/throw-error "not an item: " s))))
+    (if (isa? item ::c/usable) item (throw-error "not an item: " s))))
 
 (defn json->unit [unit-lookup unit-token]
   (if-let [str-unit (unit-lookup unit-token)]
     (str->unit str-unit)
-    (c/throw-error "unknown unit: " unit-token)))
+    (throw-error "unknown unit: " unit-token)))
 
 (defn json->layout [layout unit-dict]
   (->> layout
@@ -30,11 +32,11 @@
       "move"
       (if-let [{:strs [direction]} json-command]
         (merge base-command {:direction (keyword direction)})
-        (c/throw-error "missing direction"))
+        (throw-error "missing direction"))
       "use"
       (if-let [{:strs [item]} json-command]
         (merge base-command {:item (str->item item)})
-        (c/throw-error "missing item")))))
+        (throw-error "missing item")))))
 
 (defn create-game-state [team-names json-level]
   (c/create-game-state team-names (json->level json-level)))

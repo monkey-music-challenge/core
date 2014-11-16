@@ -115,6 +115,12 @@
 (defn seed [level]
   (apply str (mapcat (partial map name) (:layout level))))
 
+(defn find-positions [layout pred & args]
+  (for [[y row] (map-indexed vector layout)
+        [x unit] (map-indexed vector row)
+        :when (apply pred unit args)]
+    [y x]))
+
 (defn create-game-state
   [team-names
    {:keys [layout pick-up-limit turns] :as level}]
@@ -158,21 +164,9 @@
      :to-position to-position
      :to-unit (get-in layout to-position)}))
 
-(defn shuffle-commands [{:keys [random]} commands]
-  (let [weights (range (count commands) 0 -1)]
-    (random/weighted-shuffle random commands weights)))
-
-(defn run-commands [state commands]
-  (-> state
-      (run-commands* (apply-all-buffs state commands))
-      (update-in [:remaining-turns] dec)
-      tick-all-buffs))
-
-(defn find-positions [layout pred & args]
-  (for [[y row] (map-indexed vector layout)
-        [x unit] (map-indexed vector row)
-        :when (apply pred unit args)]
-    [y x]))
+(defn weighted-shuffle! [{:keys [random]} xs]
+  (let [weights (range (count xs) 0 -1)]
+    (random/weighted-shuffle! random xs weights)))
 
 (defn move-team [{:keys [original-layout teams] :as state} team-name to-position]
   (let [at-position (get-in teams [team-name :position])
@@ -252,3 +246,13 @@
 (defmethod run-command [:use ::banana]
   [state {team-name :team}]
   (assoc-in state [:teams team-name :buffs ::speedy] (::speedy buff-duration)))
+
+(defn run-commands* [state commands]
+  (reduce run-command state commands))
+
+(defn run-commands [state commands]
+  (-> state
+      (run-commands* (->> commands (apply-all-buffs state) (weighted-shuffle! state)))
+      (update-in [:remaining-turns] dec)
+      tick-all-buffs))
+

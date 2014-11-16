@@ -5,7 +5,7 @@
 (set! *main-cli-fn* (fn []))
 
 (defn args->clj [f] (fn [& args] (apply f (map js->clj args))))
-(defn return->js (partial comp clj->js))
+(def return->js (partial comp clj->js))
 
 ;; Functions returning Clojure values
 
