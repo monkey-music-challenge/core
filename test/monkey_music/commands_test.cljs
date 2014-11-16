@@ -15,9 +15,18 @@
    "units" {"m" "monkey"
             "#" "wall"
             " " "empty"
+            "b" "banana"
             "p" "playlist"
             "a" "album"
             "u" "user"
-            "s" "song"}})
+            "s" "song"}
+   "pickUpLimit" 3
+   "turns" 20})
+
+(def state (i/create-game-state ["1"] level))
+
+(-> state
+    (i/run-commands [right-1])
+    (i/run-commands [right-1]))
 
 (test-ns 'monkey-music.commands-test)

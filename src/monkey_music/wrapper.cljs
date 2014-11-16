@@ -13,7 +13,7 @@
 
 (defn str->direction [s]
   (let [direction (keyword "monkey-music.core" s)]
-    (if (isa? direction ::c/direction) direction (throw-error "not a direction: " direction))))
+    (if (isa? direction ::c/direction) direction (throw-error "not a direction: " s))))
 
 (defn json->unit [unit-lookup unit-token]
   (if-let [str-unit (unit-lookup unit-token)]
@@ -55,9 +55,10 @@
   (map (partial map name) layout))
 
 (defn game-state->json-for-team
-  [{:keys [layout pick-up-limit remaining-turns teams]} team-name]
+  [{:keys [layout pick-up-limit remaining-turns teams] :as state} team-name]
   (merge
     {"layout" (layout->json layout)
      "pickUpLimit" pick-up-limit
      "remainingTurns" remaining-turns}
+     "isGameOver" (c/game-over? state)
     (team->json (teams team-name))))
