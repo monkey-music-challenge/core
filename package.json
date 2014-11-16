@@ -10,7 +10,7 @@
     "doc": "doc"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha integration-test"
+    "test": "./node_modules/mocha/bin/mocha test-coffee"
   },
   "repository": {
     "type": "git",
