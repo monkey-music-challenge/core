@@ -36,6 +36,9 @@
         (merge base-command {:item (str->item item)})
         (c/throw-error "missing item")))))
 
+(defn create-game-state [team-names json-level]
+  (c/create-game-state team-names (json->level json-level)))
+
 (defn team->json [{:keys [position buffs picked-up-items score]}]
   {"buffs" (into {} (for [[buff remaining-turns] buffs] [(name buff) remaining-turns]))
    "position" position

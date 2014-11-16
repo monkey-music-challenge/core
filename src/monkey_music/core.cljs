@@ -128,8 +128,13 @@
      :layout layout-without-unused-monkeys
      :original-layout layout-without-unused-monkeys}))
 
-(defn game-over? [state]
-  nil)
+(defn game-over? [{:keys [layout teams remaining-turns]}]
+  (let [layout-units (flatten layout)
+        picked-up-units (flatten (map :picked-up-items (vals teams)))
+        layout-valuables (filter #(isa? % ::valuable) layout-units)
+        picked-up-valuables (filter #(isa? % ::valuable) picked-up-units)
+        no-valuables (and (empty? layout-valuables) (empty? picked-up-valuables))]
+    (or no-valuables (zero? remaining-turns))))
 
 ;; Commands
 

@@ -125,6 +125,18 @@
          [{:command-name "move" :team-name "1" :direction "right"}
           {:command-name "move" :team-name "1" :direction "left"}])))
 
+(deftest test-game-over
+  (is (c/game-over? {:layout [[::c/monkey ::c/empty ::c/banana]
+                              [::c/monkey ::c/empty ::c/user]]
+                     :teams {"1" {:picked-up-items [::c/banana]}
+                             "2" {:picked-up-items [::c/song]}}
+                     :remaining-turns 0}))
+  (is (not (c/game-over? {:layout [[::c/monkey ::c/empty ::c/banana]
+                                   [::c/monkey ::c/empty ::c/user]]
+                          :teams {"1" {:picked-up-items [::c/banana]}
+                                  "2" {:picked-up-items [::c/song]}}
+                          :remaining-turns 3}))))
+
 (deftest test-team-at
   (is (= (c/team-at
            {:teams {"1" {:position [0 1]}
