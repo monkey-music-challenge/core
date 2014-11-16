@@ -59,6 +59,9 @@
    ::tackled 2
    ::asleep 3})
 
+(defn add-buff [state team-name buff]
+  (assoc-in state [:teams team-name :buffs buff] (buff-duration buff)))
+
 ;; Immobilized - cannot run any commands
 
 (derive ::tackled ::immobilized)
@@ -154,7 +157,7 @@
 
 (defn run-commands [state commands]
   (-> state
-      (run-commands* commands)
+      (run-commands* (apply-all-buffs state commands))
       (update-in [:remaining-turns] dec)
       tick-all-buffs))
 
@@ -218,13 +221,26 @@
       (move-team state team-name exit-position)
       state)))
 
+(defn team-at [{:keys [teams]} at-position]
+  (some (fn [[team-name {:keys [position]}]]
+          (if (= position at-position) team-name))
+        (vec teams)))
+
 (defmethod run-command [:move ::monkey]
-  [{:keys [original-layout random] :as state}
+  [{:keys [original-layout layout random] :as state}
    {:keys [team-name direction]}]
   (let [{:keys [to-position]} (peek-move state team-name direction)
         push-to-position (translate to-position direction)
+        enemy-team-name (team-at state to-position)
+        unit-at-push-to-position (get-in layout push-to-position)
         push-successful (random/weighted-selection! random [true false] [3 1])]
-    state))
+    (cond
+      (not push-successful) (add-buff state team-name ::tackled)
+      (isa? unit-at-push-to-position ::movable-to) (-> state
+                                                        (move-team enemy-team-name push-to-position)
+                                                        (move-team team-name to-position)
+                                                        (add-buff enemy-team-name ::tackled))
+      :else (add-buff state enemy-team-name ::tackled))))
 
 (defmethod run-command [:use ::banana]
   [state {team-name :team}]

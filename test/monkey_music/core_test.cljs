@@ -1,7 +1,8 @@
 (ns monkey-music.core-test
   (:require-macros [cemerick.cljs.test :refer (deftest is testing)])
   (:require [cemerick.cljs.test :refer (test-ns)]
-            [monkey-music.core :as c]))
+            [monkey-music.core :as c]
+            [monkey-music.random :as r]))
 
 (deftest test-move-to-empty
   (is (= {:layout [[::c/open-door ::c/monkey]]
@@ -45,6 +46,23 @@
           :original-layout [[::c/tunnel-exit-1 ::c/empty ::c/tunnel-entrance-1]]
           :teams {"1" {:position [0 0]}}})))
 
+(deftest test-tackle-monkey
+  (is (= (dissoc
+           (c/run-command
+              {:layout [[::c/monkey ::c/monkey ::c/empty]]
+               :original-layout [[::c/empty ::c/empty ::c/empty]]
+               :random (r/create "seed")
+               :teams {"1" {:position [0 0]}
+                       "2" {:position [0 1]}}}
+              {:team-name "1" :command-name "move" :direction :right})
+           :random)
+         (dissoc
+           {:layout [[::c/empty ::c/monkey ::c/monkey]]
+            :original-layout [[::c/empty ::c/empty ::c/empty]]
+            :teams {"1" {:position [0 1]}
+                    "2" {:position [0 2] :buffs {::c/tackled 2}}}}
+           :random))))
+
 (deftest test-pick-up-item
   (is (= {:layout [[::c/monkey ::c/empty]]
           :teams {"1" {:position [0 0]
@@ -81,5 +99,16 @@
             {:command-name "move" :team-name "2" :direction "right"}])
          [{:command-name "move" :team-name "1" :direction "right"}
           {:command-name "move" :team-name "1" :direction "left"}])))
+
+(deftest test-team-at
+  (is (= (c/team-at
+           {:teams {"1" {:position [0 1]}
+                    "2" {:position [0 2]}}}
+           [0 2])
+         "2")))
+
+(deftest test-add-buff
+  (is (= (c/add-buff {:teams {"1" {:buffs {}}}} "1" ::c/speedy)
+         {:teams {"1" {:buffs {::c/speedy (c/buff-duration ::c/speedy)}}}})))
 
 (test-ns 'monkey-music.core-test)
