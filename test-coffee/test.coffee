@@ -7,26 +7,27 @@ suite 'integration tests', ->
   units =
     'M': 'monkey'
     ' ': 'empty'
+    '#': 'wall'
+    'b': 'banana'
+    'p': 'playlist'
+    's': 'song'
+    'a': 'album'
+    'u': 'user'
 
   layout = [
-    ' M'
-    '  '
+    'M  #b'
+    '##   '
+    'pa us'
   ]
 
   players = ['1']
 
-  state = mm.createGameState players,
-    turns: 10
-    pickUpLimit: 3
-    layout: layout
-    units: units
+  state = mm.createGameState(players, turns: 20, pickUpLimit: 3, layout: layout, units: units)
 
-  test 'createGameState', ->
-    console.log(mm.gameStateForTeam(state, '1'))
-    console.log(mm.parseCommand
-      command: 'move'
-      team: '1'
-      direction: 'left')
+  test 'bananas', ->
+    cmd = mm.parseCommand(command: 'move', team: '1', direction: 'right')
+    state = mm.runCommands([cmd])
+    #console.log(mm.gameStateForPlayer('1'))
     assert.equal("yes", "yes")
 
 #suite 'tests', ->
