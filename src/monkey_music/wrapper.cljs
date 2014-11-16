@@ -35,7 +35,7 @@
     (case command
       "move"
       (if-let [{:strs [direction]} json-command]
-        (merge base-command {:direction (keyword direction)})
+        (merge base-command {:direction (str->direction direction)})
         (throw-error "missing direction"))
       "use"
       (if-let [{:strs [item]} json-command]

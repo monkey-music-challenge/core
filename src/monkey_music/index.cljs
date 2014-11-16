@@ -16,7 +16,7 @@
   (wrapper/create-game-state (js->clj player-names) (js->clj level)))
 
 (defn run-commands [state commands]
-  (core/run-commands* state (js->clj commands)))
+  (core/run-commands state (js->clj commands)))
 
 ;; Functions returning JS values
 
