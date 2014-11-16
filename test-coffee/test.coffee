@@ -24,10 +24,15 @@ suite 'integration tests', ->
 
   state = mm.createGameState(players, turns: 20, pickUpLimit: 3, layout: layout, units: units)
 
+  right = [mm.parseCommand(command: 'move', team: '1', direction: 'right')]
+  down = [mm.parseCommand(command: 'move', team: '1', direction: 'down')]
+
   test 'bananas', ->
-    cmd = mm.parseCommand(command: 'move', team: '1', direction: 'right')
-    state = mm.runCommands([cmd])
-    #console.log(mm.gameStateForPlayer('1'))
+    console.log(mm.gameStateForTeam(state, '1'))
+    console.log(mm.gameStateForTeam(state, '1'))
+    console.log(mm.gameStateForTeam(state, '1'))
+    state2 = mm.runCommands(right)
+    console.log(mm.gameStateForTeam(state2, '1'))
     assert.equal("yes", "yes")
 
 #suite 'tests', ->

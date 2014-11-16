@@ -28,6 +28,7 @@
 
 (derive ::empty ::movable-to)
 (derive ::open-door ::movable-to)
+(derive ::tunnel-exit ::movable-to)
 
 ;; Items - can be picked up
 
@@ -172,7 +173,7 @@
 (defn move-team [{:keys [original-layout teams] :as state} team-name to-position]
   (let [at-position (get-in teams [team-name :position])
         original-at-unit (get-in original-layout at-position)
-        new-at-unit (if-not (isa? original-at-unit ::pick-upable)
+        new-at-unit (if (isa? original-at-unit ::movable-to)
                       original-at-unit ::empty)]
     (-> state
         (assoc-in (into [:layout] at-position) new-at-unit)
