@@ -55,4 +55,31 @@
                          :picked-up-items []}}}
            {:team-name "1" :command-name "move" :direction :right}))))
 
+(deftest test-apply-sleep-buff
+  (is (nil? (c/apply-buffs
+              {:teams {"1" {:buffs {::c/asleep 1}}}}
+              {:command-name "move" :team-name "1" :direction "right"}))))
+
+(deftest test-apply-no-buff
+  (is (= (c/apply-buffs
+           {:teams {"1" {:buffs {}}}}
+           {:command-name "move" :team-name "1" :direction "right"})
+         {:command-name "move" :team-name "1" :direction "right"})))
+
+(deftest test-apply-speedy-buff
+  (is (= (c/apply-buffs
+           {:teams {"1" {:buffs {::c/speedy 1}}}}
+           {:command-name "move" :team-name "1" :directions ["right", "left"]})
+         [{:command-name "move" :team-name "1" :direction "right"}
+          {:command-name "move" :team-name "1" :direction "left"}])))
+
+(deftest test-apply-all-buffs
+  (is (= (c/apply-all-buffs
+           {:teams {"1" {:buffs {::c/speedy 1}}
+                    "2" {:buffs {::c/asleep 1}}}}
+           [{:command-name "move" :team-name "1" :directions ["right", "left"]}
+            {:command-name "move" :team-name "2" :direction "right"}])
+         [{:command-name "move" :team-name "1" :direction "right"}
+          {:command-name "move" :team-name "1" :direction "left"}])))
+
 (test-ns 'monkey-music.core-test)

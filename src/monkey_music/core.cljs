@@ -128,15 +128,25 @@
 
 ;; Commands
 
-(defn peek-move [state team-name direction]
-  (let [at-position (get-in state [:teams team-name :position])
-        to-position (translate at-position direction)
-        to-unit (get-in state (into [:layout] to-position) ::out-of-bounds)
-        original-at-unit (get-in state (into [:original-layout] at-position))]
+(defn apply-buffs
+  [{:keys [teams] :as state}
+   {:keys [team-name command-name directions] :as command}]
+  (let [buffs (get-in teams [team-name :buffs])]
+    (cond
+      (some #(isa? % ::immobilized) (keys buffs)) nil
+      (and (::speedy buffs) directions) (take 2 (map #(assoc (dissoc command :directions) :direction %) directions))
+      :else command)))
+
+(defn apply-all-buffs [state commands]
+  (remove nil? (flatten (map #(apply-buffs state %) commands))))
+
+(defn peek-move
+  [{:keys [teams layout original-layout] :as state} team-name direction]
+  (let [at-position (get-in teams [team-name :position])
+        to-position (translate at-position direction)]
     {:at-position at-position
      :to-position to-position
-     :to-unit to-unit
-     :original-at-unit original-at-unit}))
+     :to-unit (get-in layout to-position)}))
 
 (defn shuffle-commands [{:keys [random]} commands]
   (let [weights (range (count commands) 0 -1)]
@@ -154,9 +164,9 @@
         :when (apply pred unit args)]
     [y x]))
 
-(defn move-team [state team-name to-position]
-  (let [at-position (get-in state [:teams team-name :position])
-        original-at-unit (get-in state (into [:original-layout] at-position))
+(defn move-team [{:keys [original-layout teams] :as state} team-name to-position]
+  (let [at-position (get-in teams [team-name :position])
+        original-at-unit (get-in original-layout at-position)
         new-at-unit (if-not (isa? original-at-unit ::pick-upable)
                       original-at-unit ::empty)]
     (-> state
@@ -189,23 +199,32 @@
         (assoc-in [:teams team-name :picked-up-items] non-valuables))))
 
 (defmethod run-command [:move ::pick-upable]
-  [state {:keys [team-name direction]}]
+  [{:keys [layout] :as state}
+   {:keys [team-name direction] :as command}]
   (let [{:keys [to-position to-unit]} (peek-move state team-name direction)]
     (-> state
         (assoc-in (into [:layout] to-position) ::empty)
         (update-in [:teams team-name :picked-up-items] conj to-unit))))
 
 (defmethod run-command [:move ::tunnel-entrance]
-  [{:keys [original-layout] :as state}
+  [{:keys [layout original-layout] :as state}
    {:keys [team-name direction] :as command}]
   (let [{:keys [to-unit]} (peek-move state team-name direction)
         exit (exit-for to-unit)
         exit-position (first (find-positions original-layout = exit))
-        unit-at-exit-position (get-in state (into [:layout] exit-position))
-        exit-is-blocked (not (isa? unit-at-exit-position ::tunnel-exit))]
+        unit-at-exit-position (get-in layout exit-position)
+        exit-is-blocked (not (isa? unit-at-exit-position exit))]
     (if-not exit-is-blocked
-      (move-team state team-name tunnel-exit-position)
+      (move-team state team-name exit-position)
       state)))
+
+(defmethod run-command [:move ::monkey]
+  [{:keys [original-layout random] :as state}
+   {:keys [team-name direction]}]
+  (let [{:keys [to-position]} (peek-move state team-name direction)
+        push-to-position (translate to-position direction)
+        push-successful (random/weighted-selection! random [true false] [3 1])]
+    state))
 
 (defmethod run-command [:use ::banana]
   [state {team-name :team}]
