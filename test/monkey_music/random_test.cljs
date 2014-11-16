@@ -1,4 +1,4 @@
-(ns monkey-music.test.random
+(ns monkey-music.random-test
   (:require-macros [cemerick.cljs.test :refer (deftest is testing)])
   (:require [cemerick.cljs.test :refer (test-ns)]
             [monkey-music.random :as random]))

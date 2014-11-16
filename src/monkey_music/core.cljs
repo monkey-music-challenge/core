@@ -3,7 +3,7 @@
 
 (defn throw-error [& msgs] (throw (js/Error. (apply str msgs))))
 
-;; Entities - can exist on the map
+;; Units - can exist on the map
 
 (derive ::empty ::unit)
 (derive ::song ::unit)
@@ -23,7 +23,7 @@
 (def exit-for
   {::tunnel-entrance-1 ::tunnel-exit-1})
 
-;; Entities that can be moved to 
+;; Units that can be moved to 
 
 (derive ::empty ::movable-to)
 (derive ::open-door ::movable-to)
