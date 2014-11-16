@@ -36,6 +36,33 @@
             [::c/empty ::c/monkey ::c/monkey]]
            isa? ::c/monkey))))
 
+(deftest test-create-team
+  (is (= (c/create-team [0 0])
+         {:position [0 0]
+          :buffs {}
+          :picked-up-items []
+          :score 0})))
+
+(deftest test-create-teams
+  (is (= (c/create-teams ["1" "2"] [[0 0] [1 1] [2 2]])
+         {"1" {:position [0 0] :buffs {} :picked-up-items [] :score 0}
+          "2" {:position [1 1] :buffs {} :picked-up-items [] :score 0}})))
+
+(deftest test-create-game-state
+  (is (= (with-redefs [r/create (constantly :mock)]
+           (c/create-game-state
+             ["1" "2"]
+             {:layout [[::c/monkey ::c/empty ::c/monkey ::c/monkey]]
+              :pick-up-limit 3
+              :turns 10}))
+         {:teams {"1" {:position [0 0] :buffs {} :picked-up-items [] :score 0}
+                  "2" {:position [0 2] :buffs {} :picked-up-items [] :score 0}}
+          :random :mock
+          :pick-up-limit 3
+          :remaining-turns 10
+          :layout [[::c/monkey ::c/empty ::c/monkey ::c/empty]]
+          :original-layout [[::c/monkey ::c/empty ::c/monkey ::c/empty]]})))
+
 (deftest test-move-to-tunnel-entrance
   (is (= (c/run-command
            {:layout [[::c/tunnel-exit-1 ::c/monkey ::c/tunnel-entrance-1]]

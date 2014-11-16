@@ -107,8 +107,6 @@
 (defn create-teams [team-names monkey-positions]
   (if-not (= (count team-names) (count (distinct team-names)))
     (throw-error "duplicate team names: " team-names))
-  (if-not (= (count team-names) (count monkey-positions))
-    (throw-error "wrong number of teams"))
   (let [teams (map create-team monkey-positions)]
     (into {} (map vector team-names teams))))
 
@@ -118,13 +116,17 @@
   (apply str (mapcat (partial map name) (:layout level))))
 
 (defn create-game-state
-  [team-names {:keys [layout pick-up-limit turns starting-positions]}]
-  {:teams (create-teams team-names starting-positions)
-   :random (random/create (seed level))
-   :pick-up-limit pick-up-limit
-   :remaining-turns turns
-   :layout layout
-   :original-layout layout})
+  [team-names
+   {:keys [layout pick-up-limit turns] :as level}]
+  (let [monkey-positions (find-positions layout = ::monkey)
+        unused-monkey-positions (drop (count team-names) monkey-positions)
+        layout-without-unused-monkeys (reduce #(assoc-in %1 %2 ::empty) layout unused-monkey-positions)]
+    {:teams (create-teams team-names monkey-positions)
+     :random (random/create (seed level))
+     :pick-up-limit pick-up-limit
+     :remaining-turns turns
+     :layout layout-without-unused-monkeys
+     :original-layout layout-without-unused-monkeys}))
 
 (defn game-over? [state]
   nil)
