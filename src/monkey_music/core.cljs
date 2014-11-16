@@ -164,7 +164,7 @@
         to-position (translate at-position direction)]
     {:at-position at-position
      :to-position to-position
-     :to-unit (get-in layout to-position)}))
+     :to-unit (get-in layout to-position ::out-of-bounds)}))
 
 (defn weighted-shuffle! [{:keys [random]} xs]
   (let [weights (range (count xs) 0 -1)]
@@ -180,13 +180,13 @@
         (assoc-in (into [:layout] to-position) ::monkey)
         (assoc-in [:teams team-name :position] to-position))))
 
-(defmulti run-command (fn [state {:keys [command-name team-name] :as command}]
-  (if-not (get-in state [:teams team-name])
+(defmulti run-command (fn [{:keys [teams] :as state} {:keys [command-name team-name] :as command}]
+  (if-not (contains? teams team-name)
     (throw-error "no such team: " team-name))
   (case command-name
     "move"
     (let [{:keys [direction]} command
-          {:keys [to-unit]} (peek-move state team-name direction)]
+          {:keys [to-unit] :as peek1} (peek-move state team-name direction)]
       [:move to-unit]))))
 
 (defmethod run-command [:move ::movable-to]
@@ -211,6 +211,8 @@
     (-> state
         (assoc-in (into [:layout] to-position) ::empty)
         (update-in [:teams team-name :picked-up-items] conj to-unit))))
+
+(defmethod run-command :default [state command] state)
 
 (defmethod run-command [:move ::tunnel-entrance]
   [{:keys [layout original-layout] :as state}
@@ -250,7 +252,7 @@
   (assoc-in state [:teams team-name :buffs ::speedy] (::speedy buff-duration)))
 
 (defn run-commands* [state commands]
-  (reduce run-command state commands))
+  (reduce #(run-command %1 %2) state commands))
 
 (defn run-commands [state commands]
   (-> state

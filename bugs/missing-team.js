@@ -1,4 +1,4 @@
-var mmc = require('monkey-music');
+var mmc = require('../');
 var level = {
   "turns": 50,
   "layout": [
@@ -9,6 +9,7 @@ var level = {
     "-# _ #",
     "M#s# p"
   ],
+  "pickUpLimit": 3,
   "units": {
     "M": "monkey",
     "s": "song",
