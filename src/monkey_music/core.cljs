@@ -3,6 +3,13 @@
 
 (defn throw-error [& msgs] (throw (js/Error. (apply str msgs))))
 
+;; Directions
+
+(derive ::left ::direction)
+(derive ::right ::direction)
+(derive ::up ::direction)
+(derive ::down ::direction)
+
 ;; Units - can exist on the map
 
 (derive ::empty ::unit)
@@ -83,11 +90,11 @@
 ;; Positions
 
 (defn translate [[y x] direction]
-  (case direction
-    :up [(dec y) x]
-    :down [(inc y) x]
-    :left [y (dec x)]
-    :right [y (inc x)]))
+  (condp isa? direction
+    ::up [(dec y) x]
+    ::down [(inc y) x]
+    ::left [y (dec x)]
+    ::right [y (inc x)]))
 
 (defn find-all [layout unit]
   (let [height (count layout)

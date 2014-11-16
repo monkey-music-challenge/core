@@ -11,6 +11,10 @@
   (let [item (keyword "monkey-music.core" s)]
     (if (isa? item ::c/usable) item (throw-error "not an item: " s))))
 
+(defn str->direction [s]
+  (let [direction (keyword "monkey-music.core" s)]
+    (if (isa? direction ::c/direction) direction (throw-error "not a direction: " direction))))
+
 (defn json->unit [unit-lookup unit-token]
   (if-let [str-unit (unit-lookup unit-token)]
     (str->unit str-unit)

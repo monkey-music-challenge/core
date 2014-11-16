@@ -34,7 +34,7 @@
 
 (deftest test-json->command
   (is (= (w/json->command {"command" "move" "team" "1" "direction" "left"})
-         {:command-name "move" :team-name "1" :direction :left}))
+         {:command-name "move" :team-name "1" :direction ::c/left}))
   (is (= (w/json->command {"command" "use" "team" "1" "item" "banana"})
          {:command-name "use" :team-name "1" :item ::c/banana}))
   (is (thrown? js/Error (w/json->command {"command" "use" "team" "1" "item" "derp"}))))
