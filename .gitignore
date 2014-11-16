@@ -13,3 +13,4 @@ lib
 /.repl
 /out
 npm-debug.log
+node_modules

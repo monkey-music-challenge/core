@@ -14,6 +14,7 @@
 (derive ::banana ::unit)
 (derive ::open-door ::unit)
 (derive ::closed-door ::unit)
+(derive ::wall ::unit)
 
 ;; Tunnels
 
