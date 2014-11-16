@@ -16,6 +16,10 @@
   {:builds [{:id "dev"
              :source-paths ["src-cljs"]
              :compiler {:output-to "lib/main.js"
+                        :optimizations :simple}}
+            {:id "dev"
+             :source-paths ["src-cljs"]
+             :compiler {:output-to "lib/main.js"
                         :optimizations :whitespace}
              :libs ""}
 

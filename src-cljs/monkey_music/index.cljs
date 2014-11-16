@@ -10,18 +10,13 @@
 ;; Functions returning Clojure values
 
 (aset js/exports "parseCommand"
-      (args->clj wrapper/json->command))
+      (fn [command] (clj->js (wrapper/json->command (js->clj command)))))
 (aset js/exports "createGameState"
-      (args->clj wrapper/create-game-state))
-(aset js/exports "runCommands"
-      (args->clj core/run-commands))
-
+      (fn [player-names level] (wrapper/create-game-state (js->clj player-names) (js->clj level))))
+(aset js/exports "runCommands" core/run-commands)
 
 ;; Functions returning JS values
 
 (aset js/exports "gameStateForTeam"
-      (return->js (args->clj wrapper/game-state->json-for-team)))
-(aset js/exports "isGameOver"
-      (return->js (args->clj core/game-over?)))
-(aset js/exports "valueOf"
-      (return->js (args->clj core/value-of)))
+      (fn [state team-name] (clj->js (wrapper/game-state->json-for-team state team-name))))
+(aset js/exports "isGameOver" core/game-over?)
