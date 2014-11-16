@@ -253,6 +253,6 @@
 
 (defn run-commands [state commands]
   (-> state
-      (run-commands* (->> commands (apply-all-buffs state) (weighted-shuffle! state)))
+      (run-commands* commands)
       (update-in [:remaining-turns] dec)
       tick-all-buffs))

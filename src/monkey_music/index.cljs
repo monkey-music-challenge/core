@@ -13,7 +13,8 @@
       (fn [command] (clj->js (wrapper/json->command (js->clj command)))))
 (aset js/exports "createGameState"
       (fn [player-names level] (wrapper/create-game-state (js->clj player-names) (js->clj level))))
-(aset js/exports "runCommands" core/run-commands)
+(aset js/exports "runCommands"
+      (fn [state commands] (core/run-commands* state (js->clj commands))))
 
 ;; Functions returning JS values
 

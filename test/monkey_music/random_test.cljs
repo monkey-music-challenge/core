@@ -33,4 +33,4 @@
            (random/weighted-shuffle! (random/create "seed")
                                      [:item1 :item2] [1 1])))))
 
-;(test-ns 'monkey-music.test.random)
+(test-ns 'monkey-music.test.random)
