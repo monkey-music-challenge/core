@@ -10,7 +10,7 @@
     "doc": "doc"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha test-coffee"
+    "test": "./node_modules/mocha/bin/mocha --opts test-coffe/mocha.opts test-coffee/test.coffee"
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,8 @@
   },
   "bugs": {
     "url": "https://github.com/odsod/monkey-music-cljs/issues"
+  },
+  "devDependencies": {
+    "mocha": "~2.0.1"
   }
 }
