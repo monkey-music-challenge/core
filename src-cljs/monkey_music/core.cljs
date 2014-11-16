@@ -255,4 +255,3 @@
       (run-commands* (->> commands (apply-all-buffs state) (weighted-shuffle! state)))
       (update-in [:remaining-turns] dec)
       tick-all-buffs))
-

@@ -14,19 +14,19 @@
 
   :cljsbuild
   {:builds [{:id "dev"
-             :source-paths ["src"]
+             :source-paths ["src-cljs"]
              :compiler {:output-to "lib/main.js"
                         :optimizations :whitespace}
              :libs ""}
 
             {:id "test"
-             :source-paths ["src" "test"]
+             :source-paths ["src-cljs" "test-cljs"]
              :compiler {:output-to "target/testable.js"
                         :optimizations :simple}
              :libs ""}
 
             {:id "prod"
-             :source-paths ["src"]
+             :source-paths ["src-cljs"]
              :compiler {:output-to "lib/main.js"
                         :optimizations :advanced}
              :libs ""}]
