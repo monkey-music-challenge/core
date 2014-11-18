@@ -4,9 +4,6 @@
 
 (set! *main-cli-fn* (fn []))
 
-(defn args->clj [f] (fn [& args] (apply f (map js->clj args))))
-(def return->js (partial comp clj->js))
-
 ;; Functions returning Clojure values
 
 (defn parse-command [state command]
@@ -23,7 +20,11 @@
 (defn game-state-for-team [state team-name]
   (clj->js (wrapper/game-state->json-for-team state team-name)))
 
+(defn game-state-for-renderer [state]
+  (clj->js (wrapper/game-state->json-for-renderer state)))
+
 (aset js/exports "gameStateForTeam" game-state-for-team)
+(aset js/exports "gameStateForRenderer" game-state-for-renderer)
 (aset js/exports "isGameOver" core/game-over?)
 (aset js/exports "runCommands" run-commands)
 (aset js/exports "createGameState" create-game-state)

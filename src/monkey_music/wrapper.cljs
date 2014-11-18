@@ -41,35 +41,47 @@
 
 (defmulti json->command #(str->entity ::c/command (get % "command")))
 
-(defmulti json->command ::move [{:strs [command team direction directions]}]
+(defmethod json->command ::move [{:strs [command team direction directions]}]
   (merge {:command ::move :team-name team}
          (if directions
            {:directions (map (partial str->entity ::c/direction) directions)}
            {:direction (str->entity ::c/direction direction)})))
 
-(defmulti json->command ::use [{:strs [command team item]}]
+(defmethod json->command ::use [{:strs [command team item]}]
   {:command ::use :team-name team :item (str->entity ::c/usable item)})
 
-(defn parse-command [state command]
-  (c/validate-command state (json->command command)))
-
-(defn create-game-state [team-names json-level]
-  (c/create-game-state team-names (json->level json-level)))
-
-(defn team->json [{:keys [position buffs picked-up-items score]}]
+(defn team->json [{:keys [position buffs inventory score]}]
   {"buffs" (into {} (for [[buff remaining-turns] buffs] [(name buff) remaining-turns]))
    "position" position
-   "pickedUpItems" (map name picked-up-items)
+   "inventory" (map name inventory)
    "score" score})
 
 (defn layout->json [layout]
   (map (partial map name) layout))
 
+;;; Exports
+
+(defn create-game-state [team-names json-level]
+  (c/create-game-state team-names (json->level json-level)))
+
+(defn parse-command [state command]
+  (validate-command state (json->command command)))
+
+(defn game-state->json-for-renderer
+  [{:keys [layout base-layout inventory-size remaining-turns teams] :as state}]
+  {"layout" (layout->json layout)
+   "baseLayout" (layout->json base-layout)
+   "teams" (map (team->json teams))
+   "inventorySize" inventory-size
+   "remainingTurns" remaining-turns
+   "isGameOver" (c/game-over? state)})
+
 (defn game-state->json-for-team
-  [{:keys [layout pick-up-limit remaining-turns teams] :as state} team-name]
+  [{:keys [layout pick-up-limit remaining-turns teams] :as state}
+   team-name]
   (merge
     {"layout" (layout->json layout)
-     "pickUpLimit" pick-up-limit
+     "inventorySize" pick-up-limit
      "remainingTurns" remaining-turns}
      "isGameOver" (c/game-over? state)
     (team->json (teams team-name))))
