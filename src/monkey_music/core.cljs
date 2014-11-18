@@ -1,7 +1,10 @@
 (ns monkey-music.core
   (:require [monkey-music.random :as random]))
 
-(defn throw-error [& msgs] (throw (js/Error. (apply str msgs))))
+;; Commands
+
+(derive ::move ::command)
+(derive ::use ::command)
 
 ;; Directions
 
@@ -10,44 +13,34 @@
 (derive ::up ::direction)
 (derive ::down ::direction)
 
-;; Units - can exist on the map
+;; Entities
 
-(derive ::empty ::unit)
-(derive ::song ::unit)
-(derive ::album ::unit)
-(derive ::playlist ::unit)
-(derive ::user ::unit)
-(derive ::monkey ::unit)
-(derive ::banana ::unit)
-(derive ::open-door ::unit)
-(derive ::closed-door ::unit)
-(derive ::wall ::unit)
+(derive ::out-of-bounds ::entity)
 
-;; Tunnels
+(derive ::layoutable ::entity)
+(derive ::wall ::layoutable)
+(derive ::user ::layoutable)
+(derive ::closed-door ::layoutable)
+(derive ::lever ::layoutable)
+(derive ::tunnel ::layoutable)
+(derive ::armed-trap ::layoutable)
+(derive ::monkey ::layoutable)
 
-(derive ::tunnel-entrance-1 ::tunnel-entrance)
-(derive ::tunnel-exit-1 ::tunnel-exit)
+; derive 10 tunnels
+(for [i (range 10)]
+  (derive (keyword "monkey-music.core" (str "tunnel-" i)) ::tunnel))
 
-(def exit-for
-  {::tunnel-entrance-1 ::tunnel-exit-1})
-
-;; Units that can be moved to 
-
+(derive ::movable-to ::layoutable)
 (derive ::empty ::movable-to)
 (derive ::open-door ::movable-to)
-(derive ::tunnel-exit ::movable-to)
 
-;; Items - can be picked up
+(derive ::carryable ::layoutable)
 
-(derive ::usable ::pick-upable)
-(derive ::valuable ::pick-upable)
-
-;; Usables - can be used
-
+(derive ::usable ::carryable)
 (derive ::banana ::usable)
+(derive ::trap ::usable)
 
-;; Valuables - can be handed off to users for points
-
+(derive ::valuable ::carryable)
 (derive ::song ::valuable)
 (derive ::album ::valuable)
 (derive ::playlist ::valuable)
@@ -59,22 +52,21 @@
 
 ;; Buffs
 
-(derive ::tackled ::buff)
-(derive ::asleep ::buff)
 (derive ::speedy ::buff)
 
-(def buff-duration
-  {::speedy 4
-   ::tackled 2
-   ::asleep 3})
-
-(defn add-buff [state team-name buff]
-  (assoc-in state [:teams team-name :buffs buff] (buff-duration buff)))
-
-;; Immobilized - cannot run any commands
-
+(derive ::immobilized ::buff)
 (derive ::tackled ::immobilized)
 (derive ::asleep ::immobilized)
+(derive ::trapped ::immobilized)
+
+(def duration-of
+  {::speedy 4
+   ::tackled 2
+   ::asleep 2
+   ::trapped 2})
+
+(defn add-buff [state team-name buff]
+  (assoc-in state [:teams team-name :buffs buff] (duration-of buff)))
 
 (defn tick-buffs [buffs]
   (into {} (for [[buff remaining-turns] buffs
@@ -96,26 +88,26 @@
     ::left [y (dec x)]
     ::right [y (inc x)]))
 
-(defn find-all [layout unit]
+(defn locate-entities [layout f & args]
   (let [height (count layout)
         width (count (get layout 0))]
     (for [y (range height)
           x (range width)
-          :let [curr-unit (get-in layout [y x])]
-          :when (= curr-unit unit)]
+          :let [entity (get-in layout [y x])]
+          :when (apply f entity args)]
       [y x])))
+
+(def locate-entity (comp first locate-entities))
 
 ;; Teams
 
 (defn create-team [monkey-position]
   {:position monkey-position
    :buffs {}
-   :picked-up-items []
+   :inventory []
    :score 0})
 
 (defn create-teams [team-names monkey-positions]
-  (if-not (= (count team-names) (count (distinct team-names)))
-    (throw-error "duplicate team names: " team-names))
   (let [teams (map create-team monkey-positions)]
     (into {} (map vector team-names teams))))
 
@@ -124,49 +116,73 @@
 (defn seed [level]
   (apply str (mapcat (partial map name) (:layout level))))
 
-(defn find-positions [layout pred & args]
-  (for [[y row] (map-indexed vector layout)
-        [x unit] (map-indexed vector row)
-        :when (apply pred unit args)]
-    [y x]))
+(defn base-entity [entity]
+  (if (or (isa? entity ::carryable) (isa? entity ::monkey)) ::empty entity))
+
+(defn toggle-door [entity]
+  (condp isa? entity
+    ::open-door ::closed-door
+    ::closed-door ::open-door
+    entity))
+
+(defn remove-one [xs x]
+  (let [head (take-while (partial not= x) xs)
+        tail (drop (inc (count keep-head)) xs)]
+    (into [] (concat head tail))))
+
+(defn map-layout [f layout] (mapv (partial mapv f) layout))
+
+(def base-layout (partial map-layout base-entity))
 
 (defn create-game-state
-  [team-names
-   {:keys [layout pick-up-limit turns] :as level}]
-  (let [monkey-positions (find-positions layout = ::monkey)
+  [team-names {:keys [layout inventory-size turns] :as level}]
+  (let [monkey-positions (locate-entities layout isa? ::monkey)
         unused-monkey-positions (drop (count team-names) monkey-positions)
-        layout-without-unused-monkeys (reduce #(assoc-in %1 %2 ::empty) layout unused-monkey-positions)]
+        layout-without-unused-monkeys (reduce #(assoc-in %1 %2 ::empty)
+                                              layout unused-monkey-positions)]
     {:teams (create-teams team-names monkey-positions)
      :random (random/create (seed level))
-     :pick-up-limit pick-up-limit
+     :inventory-size inventory-size
      :remaining-turns turns
+     :traps []
      :layout layout-without-unused-monkeys
-     :original-layout layout-without-unused-monkeys}))
+     :base-layout (base-layout layout-without-unused-monkeys)}))
 
 (defn game-over? [{:keys [layout teams remaining-turns]}]
-  (let [layout-units (flatten layout)
-        picked-up-units (flatten (map :picked-up-items (vals teams)))
-        layout-valuables (filter #(isa? % ::valuable) layout-units)
-        picked-up-valuables (filter #(isa? % ::valuable) picked-up-units)
-        no-valuables (and (empty? layout-valuables) (empty? picked-up-valuables))]
-    (or no-valuables (zero? remaining-turns))))
+  (let [layout-entities (flatten layout)
+        inventory-entities (flatten (map :inventory (vals teams)))]
+    (or (zero? remaining-turns)
+        (and (not-any? #(isa? % ::valuable) layout-entities)
+             (not-any? #(isa? % ::valuable) inventory-entities)))))
+
+(defn team-at [{:keys [teams]} at-position]
+  (some (fn [[team-name {:keys [position]}]]
+          (if (= position at-position) team-name))
+        teams))
 
 ;; Commands
 
+(defn apply-speedy-buff [command]
+  (if-let [directions (:directions command)]
+    (take 2 (map #(assoc (dissoc command :directions) :direction %)
+                 directions))
+    command))
+
 (defn apply-buffs
   [{:keys [teams] :as state}
-   {:keys [team-name command-name directions] :as command}]
-  (let [buffs (get-in teams [team-name :buffs])]
+   {:keys [team-name command-name] :as command}]
+  (let [buffs (get-in teams [team-name :buffs])
+        immobilized? (some #(isa? % ::immobilized) (keys buffs))
+        speedy? (some #(isa? % ::speedy) (keys buffs))]
     (cond
-      (some #(isa? % ::immobilized) (keys buffs)) nil
-      (and (::speedy buffs) directions) (take 2 (map #(assoc (dissoc command :directions) :direction %) directions))
+      immobilized? nil
+      speedy? (apply-speedy-buff command)
       :else command)))
 
 (defn apply-all-buffs [state commands]
-  (remove nil? (flatten (map #(apply-buffs state %) commands))))
+  (remove nil? (flatten (map (partial apply-buffs state) commands))))
 
-(defn peek-move
-  [{:keys [teams layout original-layout] :as state} team-name direction]
+(defn peek-move [{:keys [teams layout]} team-name direction]
   (let [at-position (get-in teams [team-name :position])
         to-position (translate at-position direction)]
     {:at-position at-position
@@ -177,97 +193,154 @@
   (let [weights (range (count xs) 0 -1)]
     (random/weighted-shuffle! random xs weights)))
 
-(defn move-team [{:keys [original-layout teams] :as state} team-name to-position]
+(defn move-team [{:keys [base-layout teams] :as state} team-name to-position]
   (let [at-position (get-in teams [team-name :position])
-        original-at-unit (get-in original-layout at-position)
-        new-at-unit (if (isa? original-at-unit ::movable-to)
-                      original-at-unit ::empty)]
+        new-at-unit (get-in base-layout at-position)]
     (-> state
         (assoc-in (into [:layout] at-position) new-at-unit)
         (assoc-in (into [:layout] to-position) ::monkey)
         (assoc-in [:teams team-name :position] to-position))))
 
-(defmulti run-command (fn [{:keys [teams] :as state} {:keys [command-name team-name] :as command}]
-  (println "dispatch" command)
-  (when-not (contains? teams team-name)
-    (println "run-command-dispatch" command)
-    (throw-error "no such team: " team-name))
-  (case command-name
-    "move"
-    (let [{:keys [direction]} command
-          {:keys [to-unit] :as peek1} (peek-move state team-name direction)]
-      [:move to-unit])
-    "use"
-    (let [{:keys [item]} command]
-      [:use item]))))
+(defn dispatch-command [state {:keys [command team-name direction item] :as command}]
+  (condp isa? command
+    ::move [::move (:to-unit (peek-move state team-name direction))]
+    ::use [::use item]))
 
-(defmethod run-command [:move ::movable-to]
+(defmulti run-command dispatch-command)
+
+(defmethod run-command [::move ::movable-to]
   [state {:keys [team-name direction]}]
   (let [{:keys [to-position]} (peek-move state team-name direction)]
     (move-team state team-name to-position)))
 
-(defmethod run-command [:move ::user]
-  [state {:keys [team-name]}]
-  (let [items (get-in state [:teams team-name :picked-up-items])
-        valuables (filter #(isa? % ::valuable) items)
-        non-valuables (filter #(not (isa? % ::valuable)) items)
-        total-value (reduce + (map value-of valuables))]
-    (-> state
-        (update-in [:teams team-name :score] + total-value)
-        (assoc-in [:teams team-name :picked-up-items] non-valuables))))
-
-(defmethod run-command [:move ::pick-upable]
+(defmethod run-command [::move ::carryable]
   [{:keys [layout] :as state}
    {:keys [team-name direction] :as command}]
   (let [{:keys [to-position to-unit]} (peek-move state team-name direction)]
     (-> state
         (assoc-in (into [:layout] to-position) ::empty)
-        (update-in [:teams team-name :picked-up-items] conj to-unit))))
+        (update-in [:teams team-name :inventory] conj to-unit))))
 
-(defmethod run-command :default [state command] state)
+(defmethod run-command [::move ::user]
+  [state {:keys [team-name direction]}]
+  (let [items (get-in state [:teams team-name :inventory])
+        {valuables true
+         non-valuables false} (group-by #(isa? % ::valuable) items)
+        total-value (reduce + (map value-of valuables))]
+    (-> state
+        (update-in [:teams team-name :score] + total-value)
+        (assoc-in [:teams team-name :inventory] non-valuables))))
 
-(defmethod run-command [:move ::tunnel-entrance]
-  [{:keys [layout original-layout] :as state}
+(defn find-first [pred coll] (first (filter pred coll)))
+
+(defmethod run-command [::move ::tunnel]
+  [{:keys [layout] :as state}
    {:keys [team-name direction] :as command}]
-  (let [{:keys [to-unit]} (peek-move state team-name direction)
-        exit (exit-for to-unit)
-        exit-position (first (find-positions original-layout = exit))
-        unit-at-exit-position (get-in layout exit-position)
-        exit-is-blocked (not (isa? unit-at-exit-position exit))]
-    (if-not exit-is-blocked
+  (let [{:keys [to-unit at-position to-position]} (peek-move state team-name direction)
+        tunnel-positions (locate-entities layout isa? to-unit)
+        exit-position (find-first (partial not= to-position) tunnel-positions)]
+    (if exit-position
       (move-team state team-name exit-position)
       state)))
 
-(defn team-at [{:keys [teams]} at-position]
-  (some (fn [[team-name {:keys [position]}]]
-          (if (= position at-position) team-name))
-        (vec teams)))
+(defmethod run-command [::move ::lever] [state command]
+  (-> state
+      (update-in [:layout] (partial map-layout toggle-door))
+      (update-in [:base-layout] (partial map-layout toggle-door))))
 
-(defmethod run-command [:move ::monkey]
-  [{:keys [original-layout layout random] :as state}
+(defmethod run-command [::move ::monkey]
+  [{:keys [layout teams random] :as state}
    {:keys [team-name direction]}]
   (let [{:keys [to-position]} (peek-move state team-name direction)
         push-to-position (translate to-position direction)
         enemy-team-name (team-at state to-position)
         unit-at-push-to-position (get-in layout push-to-position)
-        push-successful (random/weighted-selection! random [true false] [3 1])]
-    (cond
-      (not push-successful) (add-buff state team-name ::tackled)
-      (isa? unit-at-push-to-position ::movable-to) (-> state
-                                                        (move-team enemy-team-name push-to-position)
-                                                        (move-team team-name to-position)
-                                                        (add-buff enemy-team-name ::tackled))
-      :else (add-buff state enemy-team-name ::tackled))))
+        pushable-to-position (isa? unit-at-push-to-position ::movable-to)
+        push-successful (random/weighted-selection! random [true false] [3 1])
+        steal-successful (random/weighted-selection! random [true false] [1 1])
+        enemy-items (get-in teams [team-name :inventory])
+        item-to-steal (random/weighted-selection! random enemy-items (replicate 1 (count enemy-items)))]
+    state))
+    ;(cond->
+      ;push-successful
+      ;(add-buff enemy-team-name tackled)
 
-(defmethod run-command [:use ::banana]
-  [state {team-name :team}]
-  (assoc-in state [:teams team-name :buffs ::speedy] (::speedy buff-duration)))
+      ;(not push-successful)
+      ;(add-buff team-name tackled)
 
-(defn run-commands* [state commands]
-  (reduce #(run-command %1 %2) state commands))
+      ;(and push-successful pushable-to-position)
+      ;(-> (move-team enemy-team-name push-to-position)
+          ;(move-team team-name to-position))
+
+      ;(and push-successful steal-successful)
+      ;(-> (remove-item enemy-team-name item-to-steal)
+          ;(update-in [:teams team-name :inventory] conj item-to-steal)))))
+
+(defmethod run-command [::use ::banana]
+  [{:keys [teams] :as state}
+   {:keys [team-name]}]
+  (if (some (partial isa? ::banana) (get-in teams [team-name :inventory]))
+    (-> state
+        (remove-item team-name ::banana)
+        (add-buff team-name ::speedy))
+    state))
+
+;; Traps
+
+(defn arm-traps [{:keys [trap-positions] :as state}]
+  (-> state
+      (update-in [:armed-trap-positions] into trap-positions)
+      (assoc-in :trap-positions [])))
+
+(defn check-trap [{:keys [teams] :as state} trap-position]
+  (let [{:keys [team-name]} (some #(= trap-position (:position %)) teams)]
+    (if team-name
+      (-> state
+          (update-in [:armed-trap-positions] #(remove #{trap-position} %))
+          (add-buff team-name ::trapped)))
+      state))
+
+(defn check-armed-traps [{:keys [armed-trap-positions] :as state}]
+  (reduce check-trap state armed-trap-positions))
+
+(defmethod run-command [::use ::trap]
+  [{:keys [teams] :as state}
+   {:keys [team-name]}]
+  (let [{:keys [inventory]} (teams team-name)
+        {:keys [at-position]} (peek-move state team-name facing)]
+    (if (some (partial isa? ::trap) inventory)
+      (-> state
+          (update-in [:layout :trap-positions] conj at-position)
+          (update-in [:teams team-name :inventory] remove-one ::trap)))))
+
+;; Default - do nothing
+
+(defmethod run-command :default [state command] state)
+
+;; Game loop
+
+(defn preprocess-commands [state commands]
+  (->> commands
+       (weighted-shuffle! state)
+       (apply-all-buffs state)))
+
+(defn run-all-commands [state commands]
+  (reduce run-command state commands))
+
+(defn decrease-turns [state]
+  (update-in state [:remaining-turns] dec))
+
+(defn sleep-all-absent-teams [{:keys [teams] :as state} commands]
+  (let [team-names (into #{} (map :team-name commands))
+        missing-team-names (remove team-names (map :team-name teams))]
+    (reduce #(apply-buff %1 %2 ::asleep) state missing-team-names)))
 
 (defn run-commands [state commands]
-  (-> state
-      (run-commands* commands)
-      (update-in [:remaining-turns] dec)
-      tick-all-buffs))
+  (let [preprocessed-commands (preprocess-commands state commands)]
+    (-> state
+        (arm-traps)
+        (decrease-turns)
+        (run-all-commands preprocessed-commands)
+        (sleep-all-absent-teams commands)
+        (tick-all-buffs)
+        (check-armed-traps))))

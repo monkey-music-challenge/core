@@ -1,7 +1,0 @@
---bail
---ui tdd
---reporter list
---growl
---watch lib
---no-colors
---compilers coffee:coffee-script/register

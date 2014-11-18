@@ -1,46 +1,57 @@
 (ns monkey-music.wrapper
-  (:require [monkey-music.core :as c]))
+  (:require [monkey-music.core :as c]
+            [clojure.string :as string]))
 
-(defn throw-error [& msgs] (throw (js/Error. (apply str msgs))))
+(defn str* [s]
+  (cond
+    (nil? s) "<nil>"
+    (= "" s) "<empty string>"
+    :else s))
 
-(defn str->unit [s]
-  (let [unit (keyword "monkey-music.core" s)]
-    (if (isa? unit ::c/unit) unit (throw-error "not a unit " s))))
+(defn throw-error [& msgs]
+  (throw (js/Error. (apply str (map str* msgs)))))
 
-(defn str->item [s]
-  (let [item (keyword "monkey-music.core" s)]
-    (if (isa? item ::c/usable) item (throw-error "not an item: " s))))
+(defn leaf-descendants [entity]
+  (filter (comp nil? descendants) (descendants entity)))
 
-(defn str->direction [s]
-  (let [direction (keyword "monkey-music.core" s)]
-    (if (isa? direction ::c/direction) direction (throw-error "not a direction: " s))))
+(defn str->entity [entity s]
+  (let [parsed-entity (keyword "monkey-music.core" s)]
+    (if (isa? parsed-entity entity)
+      entity
+      (throw-error "Unknown " (name entity) ": " s ". Known " (name entity) "s: "
+                   (string/join ", " (map name (leaf-descendants entity))) "."))))
 
-(defn json->unit [unit-lookup unit-token]
-  (if-let [str-unit (unit-lookup unit-token)]
-    (str->unit str-unit)
-    (throw-error "unknown unit: " unit-token)))
-
-(defn json->layout [layout unit-dict]
+(defn json->layout [layout legend]
   (->> layout
        (mapv vec)
-       (mapv (partial mapv (partial json->unit unit-dict)))))
+       (mapv (partial mapv (->> legend
+                                (str->entity ::c/layoutable))))))
 
-(defn json->level [{:strs [units turns layout pickUpLimit]}]
-  {:layout (json->layout layout units)
+(defn json->level [{:strs [legend turns layout inventorySize]}]
+  {:layout (json->layout layout legend)
    :pick-up-limit pickUpLimit
    :turns turns})
 
-(defn json->command [{:strs [command team] :as json-command}]
-  (let [base-command {:command-name command :team-name team}]
-    (case command
-      "move"
-      (if-let [{:strs [direction]} json-command]
-        (merge base-command {:direction (str->direction direction)})
-        (throw-error "missing direction"))
-      "use"
-      (if-let [{:strs [item]} json-command]
-        (merge base-command {:item (str->item item)})
-        (throw-error "missing item")))))
+(defn json->command
+  [{:strs [command team item direction directions]}]
+  (let [base-command {:command (str->entity ::c/command command) :team-name team}]
+    (condp isa? (:command base-command)
+      ::move (assoc base-command :direction (str->direction direction))
+      ::use (assoc base-command :item (str->item item)))))
+
+(defmulti json->command #(str->entity ::c/command (get % "command")))
+
+(defmulti json->command ::move [{:strs [command team direction directions]}]
+  (merge {:command ::move :team-name team}
+         (if directions
+           {:directions (map (partial str->entity ::c/direction) directions)}
+           {:direction (str->entity ::c/direction direction)})))
+
+(defmulti json->command ::use [{:strs [command team item]}]
+  {:command ::use :team-name team :item (str->entity ::c/usable item)})
+
+(defn parse-command [state command]
+  (c/validate-command state (json->command command)))
 
 (defn create-game-state [team-names json-level]
   (c/create-game-state team-names (json->level json-level)))

@@ -9,8 +9,8 @@
 
 ;; Functions returning Clojure values
 
-(defn parse-command [command]
-  (wrapper/json->command (js->clj command)))
+(defn parse-command [state command]
+  (wrapper/parse-command state (js->clj command)))
 
 (defn create-game-state [player-names level]
   (wrapper/create-game-state (js->clj player-names) (js->clj level)))
