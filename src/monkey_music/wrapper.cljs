@@ -67,7 +67,6 @@
   command)
 
 (defn parse-command [state command]
-  (println comand)
   (validate-command state (json->command command)))
 
 (defn game-state->json-for-renderer

@@ -127,7 +127,7 @@
 
 (defn remove-one [xs x]
   (let [head (take-while (partial not= x) xs)
-        tail (drop (inc (count keep-head)) xs)]
+        tail (drop (inc (count head)) xs)]
     (into [] (concat head tail))))
 
 (defn map-layout [f layout] (mapv (partial mapv f) layout))
@@ -304,11 +304,10 @@
 (defmethod run-command [::use ::trap]
   [{:keys [teams] :as state}
    {:keys [team-name]}]
-  (let [{:keys [inventory]} (teams team-name)
-        {:keys [at-position]} (peek-move state team-name facing)]
+  (let [{:keys [inventory position]} (teams team-name)]
     (if (some (partial isa? ::trap) inventory)
       (-> state
-          (update-in [:layout :trap-positions] conj at-position)
+          (update-in [:layout :trap-positions] conj position)
           (update-in [:teams team-name :inventory] remove-one ::trap)))))
 
 ;; Default - do nothing
@@ -331,7 +330,7 @@
 (defn sleep-all-absent-teams [{:keys [teams] :as state} commands]
   (let [team-names (into #{} (map :team-name commands))
         missing-team-names (remove team-names (map :team-name teams))]
-    (reduce #(apply-buff %1 %2 ::asleep) state missing-team-names)))
+    (reduce #(add-buff %1 %2 ::asleep) state missing-team-names)))
 
 (defn run-commands [state commands]
   ;(let [preprocessed-commands (preprocess-commands state commands)]
