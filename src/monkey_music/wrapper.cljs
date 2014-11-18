@@ -15,6 +15,7 @@
   (filter (comp nil? descendants) (descendants entity)))
 
 (defn str->entity [entity s]
+  (println entity s)
   (let [parsed-entity (keyword "monkey-music.core" s)]
     (if (isa? parsed-entity entity)
       parsed-entity
@@ -57,7 +58,16 @@
 (defn create-game-state [team-names json-level]
   (c/create-game-state team-names (json->level json-level)))
 
+(defmulti validate-command (fn [state command] (:command command)))
+
+(defmethod validate-command ::c/move [state command]
+  command)
+
+(defmethod validate-command ::c/use [state command]
+  command)
+
 (defn parse-command [state command]
+  (println comand)
   (validate-command state (json->command command)))
 
 (defn game-state->json-for-renderer

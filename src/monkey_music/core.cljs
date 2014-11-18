@@ -277,11 +277,9 @@
           ;(update-in [:teams team-name :inventory] conj item-to-steal)))))
 
 (defmethod run-command [::use ::banana]
-  [{:keys [teams] :as state}
-   {:keys [team-name]}]
-  (if (some (partial isa? ::banana) (get-in teams [team-name :inventory]))
+  [{:keys [teams] :as state} {:keys [team-name] :as command}]
+  (if (some #(isa? % ::banana) (get-in teams [team-name :inventory]))
     (-> state
-        (remove-item team-name ::banana)
         (add-buff team-name ::speedy))
     state))
 
@@ -325,7 +323,7 @@
        (apply-all-buffs state)))
 
 (defn run-all-commands [state commands]
-  (reduce run-command state commands))
+  (reduce #(run-command %1 %2) state commands))
 
 (defn decrease-turns [state]
   (update-in state [:remaining-turns] dec))
@@ -336,11 +334,11 @@
     (reduce #(apply-buff %1 %2 ::asleep) state missing-team-names)))
 
 (defn run-commands [state commands]
-  (let [preprocessed-commands (preprocess-commands state commands)]
-    (-> state
-        (arm-traps)
-        (decrease-turns)
-        (run-all-commands preprocessed-commands)
-        (sleep-all-absent-teams commands)
-        (tick-all-buffs)
-        (check-armed-traps))))
+  ;(let [preprocessed-commands (preprocess-commands state commands)]
+  (-> state
+      ;(arm-traps)
+      (run-all-commands commands)
+      (decrease-turns)
+      ;(sleep-all-absent-teams commands)
+      (tick-all-buffs)))
+      ;(check-armed-traps)))
