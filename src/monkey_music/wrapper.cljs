@@ -17,38 +17,31 @@
 (defn str->entity [entity s]
   (let [parsed-entity (keyword "monkey-music.core" s)]
     (if (isa? parsed-entity entity)
-      entity
+      parsed-entity
       (throw-error "Unknown " (name entity) ": " s ". Known " (name entity) "s: "
                    (string/join ", " (map name (leaf-descendants entity))) "."))))
 
 (defn json->layout [layout legend]
   (->> layout
        (mapv vec)
-       (mapv (partial mapv (->> legend
-                                (str->entity ::c/layoutable))))))
+       (mapv (partial mapv #(->> % (legend)
+                                   (str->entity ::c/layoutable))))))
 
 (defn json->level [{:strs [legend turns layout inventorySize]}]
   {:layout (json->layout layout legend)
-   :pick-up-limit pickUpLimit
+   :inventory-size inventorySize
    :turns turns})
-
-(defn json->command
-  [{:strs [command team item direction directions]}]
-  (let [base-command {:command (str->entity ::c/command command) :team-name team}]
-    (condp isa? (:command base-command)
-      ::move (assoc base-command :direction (str->direction direction))
-      ::use (assoc base-command :item (str->item item)))))
 
 (defmulti json->command #(str->entity ::c/command (get % "command")))
 
-(defmethod json->command ::move [{:strs [command team direction directions]}]
-  (merge {:command ::move :team-name team}
+(defmethod json->command ::c/move [{:strs [command team direction directions]}]
+  (merge {:command ::c/move :team-name team}
          (if directions
            {:directions (map (partial str->entity ::c/direction) directions)}
            {:direction (str->entity ::c/direction direction)})))
 
-(defmethod json->command ::use [{:strs [command team item]}]
-  {:command ::use :team-name team :item (str->entity ::c/usable item)})
+(defmethod json->command ::c/use [{:strs [command team item]}]
+  {:command ::c/use :team-name team :item (str->entity ::c/usable item)})
 
 (defn team->json [{:keys [position buffs inventory score]}]
   {"buffs" (into {} (for [[buff remaining-turns] buffs] [(name buff) remaining-turns]))
@@ -77,11 +70,11 @@
    "isGameOver" (c/game-over? state)})
 
 (defn game-state->json-for-team
-  [{:keys [layout pick-up-limit remaining-turns teams] :as state}
+  [{:keys [layout inventory-size remaining-turns teams] :as state}
    team-name]
   (merge
     {"layout" (layout->json layout)
-     "inventorySize" pick-up-limit
-     "remainingTurns" remaining-turns}
-     "isGameOver" (c/game-over? state)
+     "inventorySize" inventory-size
+     "remainingTurns" remaining-turns
+     "isGameOver" (c/game-over? state)}
     (team->json (teams team-name))))
