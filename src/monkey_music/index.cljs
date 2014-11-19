@@ -3,6 +3,7 @@
             [monkey-music.core :as core]))
 
 (set! *main-cli-fn* (fn []))
+(enable-console-print!)
 
 ;; Functions returning Clojure values
 
