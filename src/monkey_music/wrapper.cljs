@@ -15,7 +15,6 @@
   (filter (comp nil? descendants) (descendants entity)))
 
 (defn str->entity [entity s]
-  (println entity s)
   (let [parsed-entity (keyword "monkey-music.core" s)]
     (if (isa? parsed-entity entity)
       parsed-entity
