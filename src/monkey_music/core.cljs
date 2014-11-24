@@ -300,7 +300,8 @@
     (if team-name
       (-> state
           (update-in [:armed-trap-positions] #(remove #{trap-position} %))
-          (add-buff team-name ::trapped))
+          (add-buff team-name ::trapped)
+          (update-in [:teams team-name :inventory] pop))
       state)))
 
 (defn check-armed-traps [{:keys [armed-trap-positions] :as state}]
