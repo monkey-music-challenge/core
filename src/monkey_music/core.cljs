@@ -217,12 +217,14 @@
     (move-team state team-name to-position)))
 
 (defmethod run-command [::move ::carryable]
-  [{:keys [layout] :as state}
+  [{:keys [layout teams inventory-size] :as state}
    {:keys [team-name direction] :as command}]
-  (let [{:keys [to-position to-unit]} (peek-move state team-name direction)]
-    (-> state
-        (assoc-in (into [:layout] to-position) ::empty)
-        (update-in [:teams team-name :inventory] conj to-unit))))
+  (if (< (count (get-in teams [team-name :inventory])) inventory-size)
+    (let [{:keys [to-position to-unit]} (peek-move state team-name direction)]
+      (-> state
+          (assoc-in (into [:layout] to-position) ::empty)
+          (update-in [:teams team-name :inventory] conj to-unit)))
+    state))
 
 (defmethod run-command [::move ::user]
   [state {:keys [team-name direction]}]
