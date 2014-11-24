@@ -16,6 +16,9 @@
      :inventory-size 3
      :turns 10}))
 
+(deftest test-weighted-shuffle
+  (is (= [:test] (c/weighted-shuffle! state [:test]))))
+
 (deftest pick-up-banana
   (let [curr-state (-> state
                        (c/run-commands [{:command ::c/move :direction ::c/right :team-name "1"}]))]

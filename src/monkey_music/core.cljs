@@ -319,7 +319,7 @@
 
 (defn preprocess-commands [state commands]
   (->> commands
-       ;(weighted-shuffle! state)
+       (weighted-shuffle! state)
        (apply-all-buffs state)))
 
 (defn run-all-commands [state commands]

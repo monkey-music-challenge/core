@@ -8,6 +8,8 @@
   by a random spin of a roulette wheel with compartments proportional to the
   slice sizes"
   [rng slices]
+  (when-not (vector? slices)
+    (throw (js/Error. "must supply a vector to wrand!")))
   (let [total (reduce + slices)
         r (pprng/int rng total)]
     (loop [i 0 sum 0]
@@ -22,8 +24,8 @@
   (vec (concat (subvec v 0 ix) (subvec v (inc ix)))))
 
 (defn weighted-shuffle! [rng items weights]
-  (loop [remaining-items items
-         remaining-weights weights
+  (loop [remaining-items (into [] items)
+         remaining-weights (into [] weights)
          selected-items []]
     (if (empty? remaining-items)
       selected-items
