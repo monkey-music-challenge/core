@@ -5,6 +5,7 @@
 
 (derive ::move ::command)
 (derive ::use ::command)
+(derive ::idle ::command)
 
 ;; Directions
 
@@ -144,7 +145,8 @@
      :random (random/create (seed level))
      :inventory-size inventory-size
      :remaining-turns turns
-     :traps []
+     :trap-positions []
+     :armed-trap-positions []
      :layout layout-without-unused-monkeys
      :base-layout (base-layout layout-without-unused-monkeys)}))
 
@@ -204,7 +206,8 @@
 (defn dispatch-command [state {:keys [command team-name direction item] :as command}]
   (condp isa? command
     ::move [::move (:to-unit (peek-move state team-name direction))]
-    ::use [::use item]))
+    ::use [::use item]
+    ::idle ::idle))
 
 (defmulti run-command dispatch-command)
 
@@ -289,15 +292,16 @@
 (defn arm-traps [{:keys [trap-positions] :as state}]
   (-> state
       (update-in [:armed-trap-positions] into trap-positions)
-      (assoc-in :trap-positions [])))
+      (assoc :trap-positions [])))
 
 (defn check-trap [{:keys [teams] :as state} trap-position]
-  (let [{:keys [team-name]} (some #(= trap-position (:position %)) teams)]
+  (let [on-trap? (fn [[team-name team]] (= trap-position (:position team)))
+        [team-name _] (find-first on-trap? teams)]
     (if team-name
       (-> state
           (update-in [:armed-trap-positions] #(remove #{trap-position} %))
-          (add-buff team-name ::trapped)))
-      state))
+          (add-buff team-name ::trapped))
+      state)))
 
 (defn check-armed-traps [{:keys [armed-trap-positions] :as state}]
   (reduce check-trap state armed-trap-positions))
@@ -306,10 +310,14 @@
   [{:keys [teams] :as state}
    {:keys [team-name]}]
   (let [{:keys [inventory position]} (teams team-name)]
-    (if (some (partial isa? ::trap) inventory)
+    (if (some #(isa? % ::trap) inventory)
       (-> state
-          (update-in [:layout :trap-positions] conj position)
-          (update-in [:teams team-name :inventory] remove-one ::trap)))))
+          (update-in [:trap-positions] conj position)
+          (update-in [:teams team-name :inventory] remove-one ::trap))
+      state)))
+
+(defmethod run-command ::idle [state command]
+  state)
 
 ;; Default - do nothing
 
@@ -336,9 +344,9 @@
 (defn run-commands [state commands]
   (let [preprocessed-commands (preprocess-commands state commands)]
     (-> state
-      ;(arm-traps)
+      (arm-traps)
       (run-all-commands preprocessed-commands)
       (decrease-turns)
       ;(sleep-all-absent-teams commands)
+      (check-armed-traps)
       (tick-all-buffs))))
-        ;(check-armed-traps)))
