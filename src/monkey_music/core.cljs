@@ -102,14 +102,16 @@
 
 ;; Teams
 
-(defn create-team [monkey-position]
-  {:position monkey-position
+(defn create-team [team-name monkey-position]
+  {:team-name team-name
+   :position monkey-position
    :buffs {}
    :inventory []
    :score 0})
 
 (defn create-teams [team-names monkey-positions]
-  (let [teams (map create-team monkey-positions)]
+  (let [teams (map #(apply create-team %)
+                   (map vector team-names monkey-positions))]
     (into {} (map vector team-names teams))))
 
 ;; Game states
@@ -341,7 +343,7 @@
 
 (defn sleep-all-absent-teams [{:keys [teams] :as state} commands]
   (let [team-names (into #{} (map :team-name commands))
-        missing-team-names (remove team-names (map :team-name teams))]
+        missing-team-names (remove team-names (keys teams))]
     (reduce #(add-buff %1 %2 ::asleep) state missing-team-names)))
 
 (defn run-commands [state commands]
@@ -350,6 +352,6 @@
       (arm-traps)
       (run-all-commands preprocessed-commands)
       (decrease-turns)
-      ;(sleep-all-absent-teams commands)
+      (sleep-all-absent-teams commands)
       (check-armed-traps)
       (tick-all-buffs))))
