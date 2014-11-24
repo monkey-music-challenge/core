@@ -13,22 +13,24 @@
   :profiles {:dev {:plugins [[com.cemerick/austin "0.1.5"]]}}
 
   :cljsbuild
-  {:builds [{:id "dev"
+  {:builds [{:id "debug"
              :source-paths ["src"]
-             :compiler {:output-to "lib/main.js"
-                        :optimizations :simple}}
+             :compiler {:optimizations :simple
+                        :output-dir "lib/debug"
+                        :output-to "lib/debug/index.js"
+                        :source-map "lib/debug/index.js.map"}}
 
             {:id "test"
              :source-paths ["src" "test"]
              :notify-command ["nodejs" :cljs.test/node-runner "target/testable.js"]
-             :compiler {:output-to "target/testable.js"
-                        :optimizations :simple}
-             :libs ""}
+             :compiler {:output-dir "target"
+                        :output-to "target/testable.js"
+                        :optimizations :simple}}
 
             {:id "prod"
              :source-paths ["src"]
-             :compiler {:output-to "lib/main.js"
-                        :optimizations :advanced}
-             :libs ""}]
+             :compiler {:optimizations :advanced
+                        :output-dir "lib"
+                        :output-to "lib/index.js"}}]
 
    :test-commands {"unit-tests" ["nodejs" :node-runner "target/testable.js"]}})

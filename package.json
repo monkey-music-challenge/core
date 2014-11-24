@@ -2,7 +2,7 @@
   "name": "monkey-music",
   "version": "0.7.0",
   "description": "Monkey Music",
-  "main": "lib/main.js",
+  "main": "lib/index.js",
   "author": "Oscar Söderlund",
   "license": "MIT",
   "directories": {
@@ -10,7 +10,8 @@
     "doc": "doc"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha --opts test-coffe/mocha.opts test-coffee/test.coffee"
+    "test": "./node_modules/mocha/bin/mocha --opts test-coffe/mocha.opts test-coffee/test.coffee",
+    "prepublish": "lein do cljsbuild clean, cljsbuild once"
   },
   "repository": {
     "type": "git",

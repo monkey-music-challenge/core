@@ -1,8 +1,7 @@
-/out
-/resources
-/src
-/target
-/test
-level.json
-pom.xml
-project.clj
+*
+!lib/index.js
+!lib/debug/index.js
+!lib/debug/index.js.map
+!LICENSE
+!package.json
+!README.md
