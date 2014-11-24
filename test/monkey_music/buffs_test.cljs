@@ -64,4 +64,4 @@
               {:command ::c/move :team-name "4" :direction ::c/right}
               {:command ::c/move :team-name "6" :direction ::c/up}])))))
 
-(test-ns 'monkey-music.buffs-test)
+;(test-ns 'monkey-music.buffs-test)

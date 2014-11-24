@@ -49,4 +49,4 @@
          [[::c/empty ::c/lever]
           [::c/monkey ::c/closed-door]] (:layout curr-state))))
 
-(test-ns 'monkey-music.doors-test)
+;(test-ns 'monkey-music.doors-test)

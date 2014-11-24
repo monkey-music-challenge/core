@@ -57,28 +57,26 @@
 (defn create-game-state [team-names json-level]
   (c/create-game-state team-names (json->level json-level)))
 
-(defmulti validate-command (fn [state command] (:command command)))
-
-;; TODO
-(defmethod validate-command ::c/move [state command]
-  command)
-
-;; TODO
-(defmethod validate-command ::c/use [state command]
-  command)
+(defn validate-command
+  [{:keys [teams]}
+   {:keys [team-name] :as command}]
+  (if (some (partial = team-name) (vals teams))
+    command
+    (throw-error "team not part of game: " team-name)))
 
 (defn parse-command [state command]
   (validate-command state (json->command command)))
 
-;; TODO
 (defn game-state->json-for-renderer
-  [{:keys [layout base-layout inventory-size remaining-turns teams] :as state}]
+  [{:keys [layout base-layout inventory-size remaining-turns
+           teams rendering-hints] :as state}]
   {"layout" (layout->json layout)
    "baseLayout" (layout->json base-layout)
-   "teams" (map (team->json teams))
+   "teams" (mapv team->json (vals teams))
    "inventorySize" inventory-size
    "remainingTurns" remaining-turns
-   "isGameOver" (c/game-over? state)})
+   "isGameOver" (c/game-over? state)
+   "renderingHints" rendering-hints})
 
 (defn game-state->json-for-team
   [{:keys [layout inventory-size remaining-turns teams] :as state}

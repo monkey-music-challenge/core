@@ -18,14 +18,9 @@
              :compiler {:output-to "lib/main.js"
                         :optimizations :simple}}
 
-            ;{:id "dev"
-             ;:source-paths ["src"]
-             ;:compiler {:output-to "lib/main.js"
-                        ;:optimizations :whitespace}
-             ;:libs ""}
-
             {:id "test"
              :source-paths ["src" "test"]
+             :notify-command ["nodejs" :cljs.test/node-runner "target/testable.js"]
              :compiler {:output-to "target/testable.js"
                         :optimizations :simple}
              :libs ""}

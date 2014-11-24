@@ -50,4 +50,4 @@
          [1 1] (get-in curr-state [:teams "1" :position])
          {} (get-in curr-state [:teams "1" :buffs]))))
 
-(test-ns 'monkey-music.bananas-test)
+;(test-ns 'monkey-music.bananas-test)

@@ -30,4 +30,4 @@
          [1 0] (get-in curr-state [:teams "2" :position]) ; could not move
          [0 1] (get-in curr-state [:teams "1" :position])))) ; could move
 
-(test-ns 'monkey-music.sleep-test)
+;(test-ns 'monkey-music.sleep-test)

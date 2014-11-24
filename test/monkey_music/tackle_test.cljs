@@ -86,4 +86,4 @@
          [1 1] (get-in curr-state [:teams "2" :position])
          [1 2] (get-in curr-state [:teams "3" :position])))))
 
-(test-ns 'monkey-music.tackle-test)
+;(test-ns 'monkey-music.tackle-test)

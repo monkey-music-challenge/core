@@ -23,4 +23,4 @@
          [0 2] (get-in curr-state [:teams "1" :position])
          [::c/song ::c/album] (get-in curr-state [:teams "1" :inventory]))))
 
-(test-ns 'monkey-music.inventory-test)
+;(test-ns 'monkey-music.inventory-test)
