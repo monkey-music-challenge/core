@@ -60,13 +60,13 @@
 (derive ::trapped ::immobilized)
 
 (def duration-of
-  {::speedy 4
-   ::tackled 2
-   ::asleep 2
-   ::trapped 2})
+  {::speedy 3
+   ::tackled 1
+   ::asleep 1
+   ::trapped 1})
 
 (defn add-buff [state team-name buff]
-  (assoc-in state [:teams team-name :buffs buff] (duration-of buff)))
+  (assoc-in state [:teams team-name :buffs buff] (inc (duration-of buff))))
 
 (defn tick-buffs [buffs]
   (into {} (for [[buff remaining-turns] buffs
@@ -280,7 +280,8 @@
   [{:keys [teams] :as state} {:keys [team-name] :as command}]
   (if (some #(isa? % ::banana) (get-in teams [team-name :inventory]))
     (-> state
-        (add-buff team-name ::speedy))
+        (add-buff team-name ::speedy)
+        (update-in [:teams team-name :inventory] remove-one ::banana))
     state))
 
 ;; Traps
@@ -318,7 +319,7 @@
 
 (defn preprocess-commands [state commands]
   (->> commands
-       (weighted-shuffle! state)
+       ;(weighted-shuffle! state)
        (apply-all-buffs state)))
 
 (defn run-all-commands [state commands]
@@ -333,11 +334,11 @@
     (reduce #(add-buff %1 %2 ::asleep) state missing-team-names)))
 
 (defn run-commands [state commands]
-  ;(let [preprocessed-commands (preprocess-commands state commands)]
-  (-> state
+  (let [preprocessed-commands (preprocess-commands state commands)]
+    (-> state
       ;(arm-traps)
-      (run-all-commands commands)
+      (run-all-commands preprocessed-commands)
       (decrease-turns)
       ;(sleep-all-absent-teams commands)
-      (tick-all-buffs)))
-      ;(check-armed-traps)))
+      (tick-all-buffs))))
+        ;(check-armed-traps)))
