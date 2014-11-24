@@ -149,6 +149,7 @@
      :remaining-turns turns
      :trap-positions []
      :armed-trap-positions []
+     :rendering-hints []
      :layout layout-without-unused-monkeys
      :base-layout (base-layout layout-without-unused-monkeys)}))
 
@@ -346,9 +347,13 @@
         missing-team-names (remove team-names (keys teams))]
     (reduce #(add-buff %1 %2 ::asleep) state missing-team-names)))
 
+(defn clear-rendering-hints [state]
+  (assoc state :rendering-hints []))
+
 (defn run-commands [state commands]
   (let [preprocessed-commands (preprocess-commands state commands)]
     (-> state
+      (clear-rendering-hints)
       (arm-traps)
       (run-all-commands preprocessed-commands)
       (decrease-turns)

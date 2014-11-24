@@ -59,15 +59,18 @@
 
 (defmulti validate-command (fn [state command] (:command command)))
 
+;; TODO
 (defmethod validate-command ::c/move [state command]
   command)
 
+;; TODO
 (defmethod validate-command ::c/use [state command]
   command)
 
 (defn parse-command [state command]
   (validate-command state (json->command command)))
 
+;; TODO
 (defn game-state->json-for-renderer
   [{:keys [layout base-layout inventory-size remaining-turns teams] :as state}]
   {"layout" (layout->json layout)
