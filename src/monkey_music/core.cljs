@@ -255,33 +255,33 @@
       (update-in [:layout] (partial map-layout toggle-door))
       (update-in [:base-layout] (partial map-layout toggle-door))))
 
+(defn check-steal-success! [{:keys [random]}]
+  (random/weighted-selection! random [true false] [1 1]))
+
+(defn check-push-success! [{:keys [random]}]
+  (random/weighted-selection! random [true false] [3 1]))
+
 (defmethod run-command [::move ::monkey]
   [{:keys [layout teams random] :as state}
    {:keys [team-name direction]}]
   (let [{:keys [to-position]} (peek-move state team-name direction)
+        push-successful (check-push-success! state)
+        steal-successful (check-steal-success! state)
         push-to-position (translate to-position direction)
         enemy-team-name (team-at state to-position)
         unit-at-push-to-position (get-in layout push-to-position)
-        pushable-to-position (isa? unit-at-push-to-position ::movable-to)
-        push-successful (random/weighted-selection! random [true false] [3 1])
-        steal-successful (random/weighted-selection! random [true false] [1 1])
-        enemy-items (get-in teams [team-name :inventory])
-        item-to-steal (random/weighted-selection! random enemy-items (replicate 1 (count enemy-items)))]
-    state))
-    ;(cond->
-      ;push-successful
-      ;(add-buff enemy-team-name tackled)
+        enemy-inventory (get-in teams [enemy-team-name :inventory])]
+    (cond-> state
+      push-successful (add-buff enemy-team-name ::tackled)
+      (not push-successful) (add-buff team-name ::tackled)
 
-      ;(not push-successful)
-      ;(add-buff team-name tackled)
-
-      ;(and push-successful pushable-to-position)
-      ;(-> (move-team enemy-team-name push-to-position)
-          ;(move-team team-name to-position))
-
-      ;(and push-successful steal-successful)
-      ;(-> (remove-item enemy-team-name item-to-steal)
-          ;(update-in [:teams team-name :inventory] conj item-to-steal)))))
+      (and push-successful (isa? unit-at-push-to-position ::movable-to))
+      (-> (move-team enemy-team-name push-to-position)
+          (move-team team-name to-position))
+      
+      (and push-successful steal-successful)
+      (-> (update-in [:teams team-name :inventory] conj (peek enemy-inventory)) 
+          (update-in [:teams enemy-team-name :inventory] pop)))))
 
 (defmethod run-command [::use ::banana]
   [{:keys [teams] :as state} {:keys [team-name] :as command}]

@@ -18,7 +18,7 @@
         (recur (inc i) (+ (slices i) sum))))))
 
 (defn weighted-selection! [rng items slices]
-  (items (wrand! rng slices)))
+  (items (wrand! rng (into [] slices))))
 
 (defn dissoc-vec [v ix]
   (vec (concat (subvec v 0 ix) (subvec v (inc ix)))))
