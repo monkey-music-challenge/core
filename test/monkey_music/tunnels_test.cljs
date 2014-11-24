@@ -1,48 +1,39 @@
 (ns monkey-music.tunnels-test
-  (:require-macros [cemerick.cljs.test :refer (deftest is testing)])
+  (:require-macros [cemerick.cljs.test :refer (deftest is are testing)])
   (:require [cemerick.cljs.test :refer (test-ns)]
             [monkey-music.core :as c]))
 
-;; TODO
+(def state
+  (c/create-game-state
+    ["1"]
+    {:layout [[::c/monkey ::c/tunnel-1 ::c/tunnel-2]
+              [::c/tunnel-2 ::c/empty ::c/tunnel-1]]
+     :turns 10
+     :inventory-size 3}))
 
-(deftest test-tunnels
-  (let [base-layout [[::c/empty ::c/tunnel-1 ::c/tunnel-2]
-                     [::c/tunnel-2 ::c/empty ::c/tunnel-1]]
-        state {:teams {"1" {:position [0 0]}}
-               :base-layout [[::c/empty ::c/tunnel-1 ::c/tunnel-2]
-                             [::c/tunnel-2 ::c/empty ::c/tunnel-1]]
-               :layout [[::c/monkey ::c/tunnel-1 ::c/tunnel-2]
-                        [::c/tunnel-2 ::c/empty ::c/tunnel-1]]}
-        left {:command ::c/move :team-name "1" :direction ::c/left}
-        right {:command ::c/move :team-name "1" :direction ::c/right}
-        down {:command ::c/move :team-name "1" :direction ::c/down}
-        up {:command ::c/move :team-name "1" :direction ::c/up}]
-    
-  (testing "enter tunnel 1"
-    (is (= (c/run-command state right)
-           {:teams {"1" {:position [1 2]}}
-            :base-layout [[::c/empty ::c/tunnel-1 ::c/tunnel-2]
-                          [::c/tunnel-2 ::c/empty ::c/tunnel-1]]
-            :layout [[::c/empty ::c/tunnel-1 ::c/tunnel-2]
-                     [::c/tunnel-2 ::c/empty ::c/monkey]]})))
+(deftest test-enter-tunnel-1
+  (let [curr-state
+        (-> state
+            (c/run-commands [{:command ::c/move :direction ::c/right :team-name "1"}]))]
+    (are [x y] (= x y)
+         [1 2] (get-in curr-state [:teams "1" :position]))))
 
-  (testing "enter tunnel 2"
-    (is (= (c/run-command state down)
-           {:teams {"1" {:position [0 2]}}
-            :base-layout [[::c/empty ::c/tunnel-1 ::c/tunnel-2]
-                          [::c/tunnel-2 ::c/empty ::c/tunnel-1]]
-            :layout [[::c/empty ::c/tunnel-1 ::c/monkey]
-                     [::c/tunnel-2 ::c/empty ::c/tunnel-1]]})))
+(deftest test-enter-tunnel-2
+  (let [curr-state
+        (-> state
+            (c/run-commands [{:command ::c/move :direction ::c/down :team-name "1"}]))]
+    (are [x y] (= x y)
+         [0 2] (get-in curr-state [:teams "1" :position]))))
 
-  (testing "enter lots of tunnels"
-    (is (= (-> state
-               (c/run-command down)
-               (c/run-command down)
-               (c/run-command right))
-           {:teams {"1" {:position [1 0]}}
-            :base-layout [[::c/empty ::c/tunnel-1 ::c/tunnel-2]
-                          [::c/tunnel-2 ::c/empty ::c/tunnel-1]]
-            :layout [[::c/empty ::c/tunnel-1 ::c/tunnel-2]
-                     [::c/monkey ::c/empty ::c/tunnel-1]]})))))
+(deftest test-enter-lots-of-tunnels
+  (let [curr-state
+        (-> state
+            (c/run-commands [{:command ::c/move :direction ::c/down :team-name "1"}])
+            (c/run-commands [{:command ::c/move :direction ::c/down :team-name "1"}])
+            (c/run-commands [{:command ::c/move :direction ::c/right :team-name "1"}]))]
+    (are [x y] (= x y)
+         [1 0] (get-in curr-state [:teams "1" :position])
+         [[::c/empty ::c/tunnel-1 ::c/tunnel-2]
+          [::c/monkey ::c/empty ::c/tunnel-1]] (:layout curr-state))))
 
 (test-ns 'monkey-music.tunnels-test)

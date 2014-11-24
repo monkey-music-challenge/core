@@ -1,14 +1,13 @@
 (ns monkey-music.bananas-test
-  (:require-macros [cemerick.cljs.test :refer (deftest is testing)])
+  (:require-macros [cemerick.cljs.test :refer (deftest is are testing)])
   (:require [cemerick.cljs.test :refer (test-ns)]
             [monkey-music.core :as c]))
 
-;; TODO
-
 (deftest test-remove-one
-  (is (= (c/remove-one [1 2 3 4 1 2 3 4] 3) [1 2 4 1 2 3 4]))
-  (is (= (c/remove-one [1 2 1 2] 3) [1 2 1 2]))
-  (is (= (c/remove-one [] 3) [])))
+  (are [x y] (= x y)
+       [1 2 4 1 2 3 4] (c/remove-one [1 2 3 4 1 2 3 4] 3)
+       [1 2 1 2] (c/remove-one [1 2 1 2] 3)
+       [] (c/remove-one [] 3)))
 
 (def state
   (c/create-game-state
@@ -46,8 +45,9 @@
                        (c/run-commands [{:command ::c/move :directions [::c/right ::c/right] :team-name "1"}])
                        (c/run-commands [{:command ::c/move :directions [::c/right ::c/down] :team-name "1"}])
                        (c/run-commands [{:command ::c/move :directions [::c/left ::c/left] :team-name "1"}]))]
-    (is (= [::c/song ::c/album] (get-in curr-state [:teams "1" :inventory])))
-    (is (= [1 1] (get-in curr-state [:teams "1" :position])))
-    (is (= {} (get-in curr-state [:teams "1" :buffs])))))
+    (are [x y] (= x y)
+         [::c/song ::c/album] (get-in curr-state [:teams "1" :inventory])
+         [1 1] (get-in curr-state [:teams "1" :position])
+         {} (get-in curr-state [:teams "1" :buffs]))))
 
 (test-ns 'monkey-music.bananas-test)

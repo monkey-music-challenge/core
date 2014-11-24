@@ -28,8 +28,16 @@
 (derive ::monkey ::layoutable)
 
 ; derive 10 tunnels
-(for [i (range 10)]
-  (derive (keyword "monkey-music.core" (str "tunnel-" i)) ::tunnel))
+(derive ::tunnel-0 ::tunnel)
+(derive ::tunnel-1 ::tunnel)
+(derive ::tunnel-2 ::tunnel)
+(derive ::tunnel-3 ::tunnel)
+(derive ::tunnel-4 ::tunnel)
+(derive ::tunnel-5 ::tunnel)
+(derive ::tunnel-6 ::tunnel)
+(derive ::tunnel-7 ::tunnel)
+(derive ::tunnel-8 ::tunnel)
+(derive ::tunnel-9 ::tunnel)
 
 (derive ::movable-to ::layoutable)
 (derive ::empty ::movable-to)
