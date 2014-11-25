@@ -53,9 +53,10 @@
    "toTeam" to-team-name})
 
 (defmethod hint->json ::c/enter-tunnel
-  [{:keys [item team-name enter-position exit-position]}]
+  [{:keys [item team-name from-position enter-position exit-position]}]
   {"hint" "enter-tunnel"
    "team" team-name
+   "from" from-position
    "enter" enter-position
    "exit" exit-position})
 

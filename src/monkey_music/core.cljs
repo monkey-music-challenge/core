@@ -25,9 +25,10 @@
    :from-team-name from-team-name
    :to-team-name to-team-name})
 
-(defn enter-tunnel-hint [team-name enter-position exit-position]
+(defn enter-tunnel-hint [team-name from-position enter-position exit-position]
   {:hint ::enter-tunnel
    :team-name team-name
+   :from-position from-position
    :enter-position enter-position
    :exit-position exit-position})
 
@@ -230,16 +231,21 @@
   (let [weights (range (count xs) 0 -1)]
     (random/weighted-shuffle! random xs weights)))
 
-(defn move-team [{:keys [base-layout teams] :as state} team-name to-position]
+(defn move-team
+  [{:keys [base-layout teams] :as state}
+   team-name
+   to-position
+   & [{:keys [with-hint] :or {with-hint true}}]]
   (let [at-position (get-in teams [team-name :position])
         new-at-unit (get-in base-layout at-position)]
-    (-> state
-        (assoc-in (into [:layout] at-position) new-at-unit)
-        (assoc-in (into [:layout] to-position) ::monkey)
-        (assoc-in [:teams team-name :position] to-position)
-        (update-in [:rendering-hints] conj (move-hint team-name
-                                                      at-position
-                                                      to-position)))))
+    (cond-> state
+            true (assoc-in (into [:layout] at-position) new-at-unit)
+            true (assoc-in (into [:layout] to-position) ::monkey)
+            true (assoc-in [:teams team-name :position] to-position)
+            with-hint (update-in [:rendering-hints]
+                                 conj (move-hint team-name
+                                                 at-position
+                                                 to-position)))))
 
 (defn dispatch-command [state {:keys [command team-name direction item] :as command}]
   (condp isa? command
@@ -284,8 +290,9 @@
         exit-position (find-first (partial not= to-position) tunnel-positions)]
     (if exit-position
       (-> state
-          (move-team team-name exit-position)
+          (move-team team-name exit-position {:with-hint false})
           (update-in [:rendering-hints] conj (enter-tunnel-hint team-name
+                                                                at-position
                                                                 to-position
                                                                 exit-position)))
       state)))
@@ -302,7 +309,7 @@
   (random/weighted-selection! random [true false] [3 1]))
 
 (defmethod run-command [::move ::monkey]
-  [{:keys [layout teams random] :as state}
+  [{:keys [layout teams random inventory-size] :as state}
    {:keys [team-name direction]}]
   (let [{:keys [to-position]} (peek-move state team-name direction)
         push-successful (check-push-success! state)
@@ -310,6 +317,7 @@
         push-to-position (translate to-position direction)
         enemy-team-name (team-at state to-position)
         unit-at-push-to-position (get-in layout push-to-position)
+        inventory (get-in teams [team-name :inventory])
         enemy-inventory (get-in teams [enemy-team-name :inventory])
         item-to-steal (peek enemy-inventory)]
     (cond-> state
@@ -320,7 +328,8 @@
       (-> (move-team enemy-team-name push-to-position)
           (move-team team-name to-position))
       
-      (and push-successful steal-successful item-to-steal)
+      (and push-successful steal-successful item-to-steal
+           (< (count inventory) inventory-size))
       (-> (update-in [:teams team-name :inventory] conj (peek enemy-inventory)) 
           (update-in [:teams enemy-team-name :inventory] pop)
           (update-in [:rendering-hints] conj (steal-hint item-to-steal
