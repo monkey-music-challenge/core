@@ -1,11 +1,6 @@
 (ns monkey-music.index
-  (:require [cljs.nodejs :as nodejs]
-            [monkey-music.wrapper :as wrapper]
+  (:require [monkey-music.wrapper :as wrapper]
             [monkey-music.core :as core]))
-
-(try
-  (nodejs/enable-util-print!)
-  (catch js/Error e e))
 
 (try
   (.install (js/require "source-map-support"))

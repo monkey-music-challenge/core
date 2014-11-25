@@ -4,6 +4,25 @@
             [monkey-music.wrapper :as w]
             [monkey-music.core :as c]))
 
+(def state
+  (c/create-game-state
+    ["1" "2"]
+    {:layout [[::c/monkey ::c/empty]
+              [::c/song ::c/monkey]]
+     :inventory-size 3
+     :turns 10}))
+
+(deftest test-teams->json
+  (is (= {"1" {"buffs" {}
+               "position" [0 0]
+               "inventory" []
+               "score" 0}
+          "2" {"buffs" {}
+               "position" [1 1]
+               "inventory" []
+               "score" 0}}
+         (w/teams->json (:teams state)))))
+
 (deftest test-str->entity
   (are [x y] (= x y)
        ::c/monkey (w/str->entity ::c/layoutable "monkey")

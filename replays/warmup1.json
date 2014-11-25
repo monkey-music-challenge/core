@@ -1,0 +1,79 @@
+{
+  "level": "warmup",
+  "teams": ["1", "2"],
+  "outcome": {
+    "isGameOver": true,
+    "teams": {
+      "1": {
+        "score": 8,
+        "position": [1, 2]
+      },
+      "2": {
+        "score": 8,
+        "position": [2, 3]
+      }
+    }
+  },
+  "turns": [
+    [
+      {"team": "1", "command": "move", "direction": "left"},
+      {"team": "2", "command": "move", "direction": "left"}
+    ],
+    [
+      {"team": "1", "command": "move", "direction": "up"},
+      {"team": "2", "command": "move", "direction": "left"}
+    ],
+    [
+      {"team": "1", "command": "move", "direction": "up"},
+      {"team": "2", "command": "move", "direction": "up"}
+    ],
+    [
+      {"team": "1", "command": "move", "direction": "up"},
+      {"team": "2", "command": "move", "direction": "right"}
+    ],
+    [
+      {"team": "1", "command": "move", "direction": "up"},
+      {"team": "2", "command": "move", "direction": "right"}
+    ],
+    [
+      {"team": "1", "command": "move", "direction": "right"},
+      {"team": "2", "command": "move", "direction": "up"}
+    ],
+    [
+      {"team": "1", "command": "move", "direction": "right"},
+      {"team": "2", "command": "move", "direction": "up"}
+    ],
+    [
+      {"team": "1", "command": "move", "direction": "right"},
+      {"team": "2", "command": "move", "direction": "left"}
+    ],
+    [
+      {"team": "1", "command": "move", "direction": "right"},
+      {"team": "2", "command": "move", "direction": "up"}
+    ],
+    [
+      {"team": "1", "command": "move", "direction": "down"},
+      {"team": "2", "command": "move", "direction": "left"}
+    ],
+    [
+      {"team": "1", "command": "move", "direction": "up"},
+      {"team": "2", "command": "move", "direction": "up"}
+    ],
+    [
+      {"team": "1", "command": "move", "direction": "down"},
+      {"team": "2", "command": "move", "direction": "right"}
+    ],
+    [
+      {"team": "2", "command": "move", "direction": "up"}
+    ],
+    [
+      {"team": "2", "command": "move", "direction": "left"}
+    ],
+    [
+      {"team": "2", "command": "move", "direction": "down"}
+    ],
+    [
+      {"team": "2", "command": "move", "direction": "left"}
+    ]
+  ]
+}

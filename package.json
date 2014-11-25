@@ -11,7 +11,7 @@
   },
   "scripts": {
     "test": "lein do cljsbuild clean, cljsbuild auto test",
-    "prepublish": "lein do cljsbuild clean, cljsbuild once"
+    "prepublish": "lein do cljsbuild clean, cljsbuild once && ./node_modules/mocha/bin/mocha --opts integration-tests/mocha.opts"
   },
   "repository": {
     "type": "git",
@@ -21,8 +21,10 @@
     "url": "https://github.com/odsod/monkey-music-cljs/issues"
   },
   "devDependencies": {
-    "mocha": "~2.0.1",
-    "coffee-script": "~1.8.0"
+    "coffee-script": "~1.8.0",
+    "mocha": "^2.0.1",
+    "mout": "^0.11.0",
+    "referee": "^1.1.0"
   },
   "dependencies": {
     "source-map-support": "^0.2.8"

@@ -67,12 +67,15 @@
 (defn parse-command [state command]
   (validate-command state (json->command command)))
 
+(defn teams->json [teams]
+  (into {} (for [[team-name team] teams] [team-name (team->json team)])))
+
 (defn game-state->json-for-renderer
   [{:keys [layout base-layout inventory-size remaining-turns
            teams rendering-hints] :as state}]
   {"layout" (layout->json layout)
    "baseLayout" (layout->json base-layout)
-   "teams" (mapv team->json (vals teams))
+   "teams" (teams->json teams)
    "inventorySize" inventory-size
    "remainingTurns" remaining-turns
    "isGameOver" (c/game-over? state)

@@ -1,0 +1,4 @@
+--reporter list
+--ui tdd
+--no-colors
+integration-tests/*.js
