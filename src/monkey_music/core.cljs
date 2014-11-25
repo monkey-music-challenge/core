@@ -10,12 +10,26 @@
 ;; Rendering hints
 
 (derive ::steal ::hint)
+(derive ::move-team ::hint)
+(derive ::enter-tunnel ::hint)
+
+(defn move-hint [team-name from-position to-position]
+  {:hint ::move-team
+   :team-name team-name
+   :from-position from-position
+   :to-position to-position})
 
 (defn steal-hint [item from-team-name to-team-name]
   {:hint ::steal
    :item item
-   :from from-team-name
-   :to to-team-name})
+   :from-team-name from-team-name
+   :to-team-name to-team-name})
+
+(defn enter-tunnel-hint [team-name enter-position exit-position]
+  {:hint ::enter-tunnel
+   :team-name team-name
+   :enter-position enter-position
+   :exit-position exit-position})
 
 ;; Directions
 
@@ -222,7 +236,10 @@
     (-> state
         (assoc-in (into [:layout] at-position) new-at-unit)
         (assoc-in (into [:layout] to-position) ::monkey)
-        (assoc-in [:teams team-name :position] to-position))))
+        (assoc-in [:teams team-name :position] to-position)
+        (update-in [:rendering-hints] conj (move-hint team-name
+                                                      at-position
+                                                      to-position)))))
 
 (defn dispatch-command [state {:keys [command team-name direction item] :as command}]
   (condp isa? command
@@ -266,7 +283,11 @@
         tunnel-positions (locate-entities layout isa? to-unit)
         exit-position (find-first (partial not= to-position) tunnel-positions)]
     (if exit-position
-      (move-team state team-name exit-position)
+      (-> state
+          (move-team team-name exit-position)
+          (update-in [:rendering-hints] conj (enter-tunnel-hint team-name
+                                                                to-position
+                                                                exit-position)))
       state)))
 
 (defmethod run-command [::move ::lever] [state command]

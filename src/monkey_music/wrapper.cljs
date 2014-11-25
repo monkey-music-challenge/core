@@ -45,11 +45,26 @@
 
 (defmulti hint->json :hint)
 
-(defmethod hint->json ::c/steal [{:keys [item from to]}]
+(defmethod hint->json ::c/steal
+  [{:keys [item from-team-name to-team-name]}]
   {"hint" "steal"
    "item" (name item)
-   "from" from
-   "to" to})
+   "fromTeam" from-team-name
+   "toTeam" to-team-name})
+
+(defmethod hint->json ::c/enter-tunnel
+  [{:keys [item team-name enter-position exit-position]}]
+  {"hint" "enter-tunnel"
+   "team" team-name
+   "enter" enter-position
+   "exit" exit-position})
+
+(defmethod hint->json ::c/move-team
+  [{:keys [team-name from-position to-position]}]
+  {"hint" "move-team"
+   "team" team-name
+   "from" from-position
+   "to" to-position})
 
 (defn team->json [{:keys [position buffs inventory score]}]
   {"buffs" (into {} (for [[buff remaining-turns] buffs] [(name buff) remaining-turns]))
@@ -80,11 +95,13 @@
 
 (defn game-state->json-for-renderer
   [{:keys [layout base-layout inventory-size remaining-turns
-           teams rendering-hints] :as state}]
+           teams rendering-hints trap-positions armed-trap-positions] :as state}]
   {"layout" (layout->json layout)
    "baseLayout" (layout->json base-layout)
    "teams" (teams->json teams)
    "inventorySize" inventory-size
+   "trapPositions" trap-positions
+   "armedTrapPositions" armed-trap-positions
    "remainingTurns" remaining-turns
    "isGameOver" (c/game-over? state)
    "renderingHints" (map hint->json rendering-hints)})
