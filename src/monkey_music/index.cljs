@@ -1,6 +1,10 @@
 (ns monkey-music.index
-  (:require [monkey-music.wrapper :as wrapper]
+  (:require [cljs.nodejs :as nodejs]
+            [monkey-music.wrapper :as wrapper]
             [monkey-music.core :as core]))
+
+(nodejs/enable-util-print!)
+(.install (js/require "source-map-support"))
 
 (set! *main-cli-fn* (fn []))
 
@@ -23,9 +27,12 @@
 (defn game-state-for-renderer [state]
   (clj->js (wrapper/game-state->json-for-renderer state)))
 
+(defn do-throw [] (throw (js/Error. "error thrown!")))
+
 (aset js/exports "gameStateForTeam" game-state-for-team)
 (aset js/exports "gameStateForRenderer" game-state-for-renderer)
 (aset js/exports "isGameOver" core/game-over?)
 (aset js/exports "runCommands" run-commands)
 (aset js/exports "createGameState" create-game-state)
 (aset js/exports "parseCommand" parse-command)
+(aset js/exports "doThrow" do-throw)

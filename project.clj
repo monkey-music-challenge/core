@@ -16,6 +16,7 @@
   {:builds [{:id "debug"
              :source-paths ["src"]
              :compiler {:optimizations :simple
+                        :target :nodejs
                         :output-dir "lib/debug"
                         :output-to "lib/debug/index.js"
                         :source-map "lib/debug/index.js.map"}}
@@ -24,12 +25,14 @@
              :source-paths ["src" "test"]
              :notify-command ["nodejs" :cljs.test/node-runner "target/testable.js"]
              :compiler {:output-dir "target"
+                        :target :nodejs
                         :output-to "target/testable.js"
                         :optimizations :simple}}
 
             {:id "prod"
              :source-paths ["src"]
              :compiler {:optimizations :advanced
+                        :target :nodejs
                         :output-dir "lib"
                         :output-to "lib/index.js"}}]
 
