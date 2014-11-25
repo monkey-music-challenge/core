@@ -3,8 +3,13 @@
             [monkey-music.wrapper :as wrapper]
             [monkey-music.core :as core]))
 
-(nodejs/enable-util-print!)
-(.install (js/require "source-map-support"))
+(try
+  (nodejs/enable-util-print!)
+  (catch js/Error e e))
+
+(try
+  (.install (js/require "source-map-support"))
+  (catch js/Error e e))
 
 (set! *main-cli-fn* (fn []))
 
