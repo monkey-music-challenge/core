@@ -1,0 +1,27 @@
+{
+  "turns": 50,
+  "inventorySize": 3,
+  "layout": {
+    "#M####sPa",
+    "b ##a# # ",
+    "# ##M# s ",
+    "# ## #  #",
+    "# ## # #b",
+    "b #s   #s",
+    "# # #U   ",
+    "# #    ##",
+    "# #    #P",
+    "b # #  #a",
+    "#   #b  s"
+  },
+  "legend": {
+    "M": "monkey",
+    "U": "user",
+    "#": "wall",
+    "s": "song",
+    "a": "album",
+    "P": "playlist",
+    "b": "banana",
+    " ": "empty"
+  }
+}
