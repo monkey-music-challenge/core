@@ -1,0 +1,31 @@
+{
+  "turns": 100,
+  "inventorySize": 4,
+  "layout": [
+   "ass|         MU",
+   "###            ",
+   "    /          ",
+   "#.# ###-### #-#",
+   "s # #P   P# # s",
+   "# # ## / ## # #",
+   "a # #P   P# # a",
+   "# # ## / ## # #",
+   "s # #P   P# # s",
+   "#-# ###-### #.#",
+   "          /    ",
+   "            ###",
+   "UM         |ssa"                    
+  ],
+  "legend": {
+    "|": "closed-door",
+    "-": "closed-door",
+    ".": "open-door",
+    "#": "wall",
+    "s": "song",
+    "a": "album",
+    "p": "playlist",
+    "M": "monkey",
+    "U": "user",
+    "/": "lever"
+  }
+}
