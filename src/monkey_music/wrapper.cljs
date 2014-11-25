@@ -43,6 +43,14 @@
 (defmethod json->command ::c/use [{:strs [command team item]}]
   {:command ::c/use :team-name team :item (str->entity ::c/usable item)})
 
+(defmulti hint->json :hint)
+
+(defmethod hint->json ::c/steal [{:keys [item from to]}]
+  {"hint" "steal"
+   "item" (name item)
+   "from" from
+   "to" to})
+
 (defn team->json [{:keys [position buffs inventory score]}]
   {"buffs" (into {} (for [[buff remaining-turns] buffs] [(name buff) remaining-turns]))
    "position" position
@@ -79,7 +87,7 @@
    "inventorySize" inventory-size
    "remainingTurns" remaining-turns
    "isGameOver" (c/game-over? state)
-   "renderingHints" rendering-hints})
+   "renderingHints" (map hint->json rendering-hints)})
 
 (defn game-state->json-for-team
   [{:keys [layout inventory-size remaining-turns teams] :as state}

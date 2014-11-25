@@ -7,6 +7,16 @@
 (derive ::use ::command)
 (derive ::idle ::command)
 
+;; Rendering hints
+
+(derive ::steal ::hint)
+
+(defn steal-hint [item from-team-name to-team-name]
+  {:hint ::steal
+   :item item
+   :from from-team-name
+   :to to-team-name})
+
 ;; Directions
 
 (derive ::left ::direction)
@@ -279,7 +289,8 @@
         push-to-position (translate to-position direction)
         enemy-team-name (team-at state to-position)
         unit-at-push-to-position (get-in layout push-to-position)
-        enemy-inventory (get-in teams [enemy-team-name :inventory])]
+        enemy-inventory (get-in teams [enemy-team-name :inventory])
+        item-to-steal (peek enemy-inventory)]
     (cond-> state
       push-successful (add-buff enemy-team-name ::tackled)
       (not push-successful) (add-buff team-name ::tackled)
@@ -288,9 +299,12 @@
       (-> (move-team enemy-team-name push-to-position)
           (move-team team-name to-position))
       
-      (and push-successful steal-successful)
+      (and push-successful steal-successful item-to-steal)
       (-> (update-in [:teams team-name :inventory] conj (peek enemy-inventory)) 
-          (update-in [:teams enemy-team-name :inventory] pop)))))
+          (update-in [:teams enemy-team-name :inventory] pop)
+          (update-in [:rendering-hints] conj (steal-hint item-to-steal
+                                                         team-name
+                                                         enemy-team-name))))))
 
 (defmethod run-command [::use ::banana]
   [{:keys [teams] :as state} {:keys [team-name] :as command}]
