@@ -60,7 +60,7 @@
 (defn validate-command
   [{:keys [teams]}
    {:keys [team-name] :as command}]
-  (if (some (partial = team-name) (vals teams))
+  (if (some (partial = team-name) (keys teams))
     command
     (throw-error "team not part of game: " team-name)))
 

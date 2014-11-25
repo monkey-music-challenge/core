@@ -12,7 +12,15 @@
      :inventory-size 3
      :turns 10}))
 
-(deftest test-parse-command-with-unknown-team
-  (is (thrown? js/Error (w/parse-command state {"command" "move" "direction" "left" "team" "3"}))))
+(deftest test-parse-valid-command
+  (is (= {:command ::c/move :directions [::c/left ::c/right] :team-name "1"}
+         (w/parse-command state {"command" "move"
+                                 "directions" ["left" "right"]
+                                 "team" "1"}))))
 
-;(test-ns 'monkey-music.parse-command-test)
+(deftest test-parse-command-with-unknown-team
+  (is (thrown? js/Error (w/parse-command state {"command" "move"
+                                                "direction" "left"
+                                                "team" "3"}))))
+
+(test-ns 'monkey-music.parse-command-test)
