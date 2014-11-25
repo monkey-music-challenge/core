@@ -353,13 +353,11 @@
 
 (defn check-trap [{:keys [teams] :as state} trap-position]
   (let [on-trap? (fn [[team-name team]] (= trap-position (:position team)))
-        [team-name _] (find-first on-trap? teams)]
-    (if team-name
-      (-> state
-          (update-in [:armed-trap-positions] #(remove #{trap-position} %))
-          (add-buff team-name ::trapped)
-          (update-in [:teams team-name :inventory] pop))
-      state)))
+        [team-name {:keys [inventory]}] (find-first on-trap? teams)]
+      (cond-> state
+          team-name (update-in [:armed-trap-positions] #(remove #{trap-position} %))
+          team-name (add-buff team-name ::trapped)
+          (pos? (count inventory)) (update-in [:teams team-name :inventory] pop))))
 
 (defn check-armed-traps [{:keys [armed-trap-positions] :as state}]
   (reduce check-trap state armed-trap-positions))

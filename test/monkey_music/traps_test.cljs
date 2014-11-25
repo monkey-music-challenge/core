@@ -58,4 +58,21 @@
          [0 0] (get-in curr-state [:teams "2" :position])
          [] (get-in curr-state [:teams "2" :inventory]))))
 
-;(test-ns 'monkey-music.traps-test)
+(deftest test-trigger-trap-with-empty-inventory
+  (let [curr-state
+        (-> state
+            (c/run-commands [{:command ::c/move :direction ::c/right :team-name "1"}
+                             {:command ::c/idle :team-name "2"}])
+            (c/run-commands [{:command ::c/use :item ::c/trap :team-name "1"}
+                             {:command ::c/idle :team-name "2"}])
+            (c/run-commands [{:command ::c/move :direction ::c/right :team-name "1"}
+                             {:command ::c/idle :team-name "2"}])
+            (c/run-commands [{:command ::c/idle :team-name "1"}
+                             {:command ::c/move :direction ::c/up :team-name "2"}]))]
+    (are [x y] (= x y)
+         {::c/trapped 1} (get-in curr-state [:teams "2" :buffs])
+         [] (:armed-trap-positions curr-state)
+         [0 0] (get-in curr-state [:teams "2" :position])
+         [] (get-in curr-state [:teams "2" :inventory]))))
+
+(test-ns 'monkey-music.traps-test)
