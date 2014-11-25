@@ -78,8 +78,11 @@
    "inventory" (map name inventory)
    "score" score})
 
+(defn layoutable->str [layoutable]
+  (if (isa? layoutable ::trap) "trap" (name layoutable)))
+
 (defn layout->json [layout]
-  (map (partial map name) layout))
+  (map (partial map layoutable->str) layout))
 
 ;;; Exports
 
