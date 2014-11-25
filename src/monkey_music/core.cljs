@@ -12,6 +12,7 @@
 (derive ::steal ::hint)
 (derive ::move-team ::hint)
 (derive ::enter-tunnel ::hint)
+(derive ::trigger-trap ::hint)
 
 (defn move-hint [team-name from-position to-position]
   {:hint ::move-team
@@ -31,6 +32,10 @@
    :from-position from-position
    :enter-position enter-position
    :exit-position exit-position})
+
+(defn trigger-trap-hint [team-name]
+  {:hint ::trigger-trap
+   :team-name team-name})
 
 ;; Directions
 
@@ -357,6 +362,7 @@
       (cond-> state
           team-name (update-in [:armed-trap-positions] #(remove #{trap-position} %))
           team-name (add-buff team-name ::trapped)
+          team-name (update-in [:animation-hints] conj (trigger-trap-hint team-name))
           (pos? (count inventory)) (update-in [:teams team-name :inventory] pop))))
 
 (defn check-armed-traps [{:keys [armed-trap-positions] :as state}]
