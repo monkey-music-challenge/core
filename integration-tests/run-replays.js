@@ -1,4 +1,4 @@
-var mm = require('../lib/debug');
+var mm = require('..');
 
 var repeat = require('mout/string/repeat');
 var assertPartialMatch = require('referee').assert.match;
