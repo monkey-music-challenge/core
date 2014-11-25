@@ -92,9 +92,12 @@
 (defn validate-command
   [{:keys [teams]}
    {:keys [team-name] :as command}]
-  (if (some (partial = team-name) (keys teams))
-    command
-    (throw-error "team not part of game: " team-name)))
+  (when-not (some (partial = team-name) (keys teams))
+    (throw-error "team not part of game: " team-name))
+  (when (isa? (:command command) ::c/move)
+    (when (and (:directions command) (not (get-in (teams team-name) [:buffs ::c/speedy])))
+      (throw-error "can only make multiple moves with speedy buff")))
+  command)
 
 (defn parse-command [state command]
   (validate-command state (json->command command)))
