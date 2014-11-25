@@ -23,4 +23,4 @@
                                                 "direction" "left"
                                                 "team" "3"}))))
 
-(test-ns 'monkey-music.parse-command-test)
+;(test-ns 'monkey-music.parse-command-test)
