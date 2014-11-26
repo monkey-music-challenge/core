@@ -1,19 +1,18 @@
 {
   "turns": 50,
   "inventorySize": 3,
-  "layout": {
-    "#M####sPa",
-    "b ##a# # ",
-    "# ##M# s ",
-    "# ## #  #",
-    "# ## # #b",
-    "b #s   #s",
-    "# # #U   ",
-    "# #    ##",
-    "# #    #P",
-    "b # #  #a",
-    "#   #b  s"
-  },
+  "layout": [
+    "       PPP",
+    " b########",
+    "  ss   U#P",
+    "a    ###PP",
+    "##ba   s# ",
+    "sb###a s# ",
+    "s#ass#  b ",
+    "M#M       ",
+    " U  ##  ##",
+    "  ssb# ssa"
+  ],
   "legend": {
     "M": "monkey",
     "U": "user",

@@ -1,0 +1,23 @@
+{
+  "level": "bananas",
+  "teams": ["1", "2"],
+  "outcome": {
+    "teams": {
+      "1": {
+        "score": 3
+      }
+    }
+  },
+  "turns": [
+    [{"team": "1", "command": "move", "direction": "up"}],
+    [{"team": "1", "command": "move", "direction": "up"}],
+    [{"team": "1", "command": "move", "direction": "up"}],
+    [{"team": "1", "command": "move", "direction": "up"}],
+    [{"team": "1", "command": "move", "direction": "right"}],
+    [{"team": "1", "command": "use", "item": "banana"}],
+    [{"team": "1", "command": "move", "directions": ["down", "down"]}],
+    [{"team": "1", "command": "move", "directions": ["down", "down"]}],
+    [{"team": "1", "command": "move", "directions": ["right", "right"]}],
+    [{"team": "1", "command": "move", "directions": ["up"]}]
+  ]
+}
