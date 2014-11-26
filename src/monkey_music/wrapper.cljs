@@ -43,6 +43,9 @@
 (defmethod json->command ::c/use [{:strs [command team item]}]
   {:command ::c/use :team-name team :item (str->entity ::c/usable item)})
 
+(defmethod json->command ::c/idle [{:strs [command team]}]
+  {:command ::c/idle :team-name team})
+
 (defmulti hint->json :hint)
 
 (defmethod hint->json ::c/steal

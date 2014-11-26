@@ -23,12 +23,10 @@
           (-> state
               (c/add-buff "1" ::c/speedy)
               (c/add-buff "2" ::c/trapped)
-              (c/add-buff "3" ::c/asleep)
               (c/tick-all-buffs))]
       (are [x y] (= x y)
-           {::c/speedy 3} (get-in curr-state [:teams "1" :buffs])
-           {::c/trapped 1} (get-in curr-state [:teams "2" :buffs])
-           {::c/asleep 1} (get-in curr-state [:teams "3" :buffs])))))
+           {::c/speedy (c/duration-of ::c/speedy)} (get-in curr-state [:teams "1" :buffs])
+           {::c/trapped (c/duration-of ::c/trapped)} (get-in curr-state [:teams "2" :buffs])))))
 
 (deftest test-tick-all-buffs-and-remove
   (testing "tick all buffs"
@@ -36,18 +34,24 @@
           (-> state
               (c/add-buff "1" ::c/speedy)
               (c/add-buff "2" ::c/trapped)
-              (c/add-buff "3" ::c/asleep)
+              (c/tick-all-buffs)
+              (c/tick-all-buffs)
+              (c/tick-all-buffs)
+              (c/tick-all-buffs)
+              (c/tick-all-buffs)
+              (c/tick-all-buffs)
+              (c/tick-all-buffs)
               (c/tick-all-buffs)
               (c/tick-all-buffs))]
       (are [x y] (= x y)
-           {::c/speedy 2} (get-in curr-state [:teams "1" :buffs])))))
+           {} (get-in curr-state [:teams "1" :buffs])
+           {} (get-in curr-state [:teams "2" :buffs])))))
 
 (deftest test-apply-all-buffs
   (testing "apply multiple buffs"
     (let [curr-state
           (-> state
               (c/add-buff "1" ::c/speedy)
-              (c/add-buff "2" ::c/asleep)
               (c/add-buff "3" ::c/trapped)
               (c/add-buff "4" ::c/tackled))]
       (are [x y] (= x y)
@@ -59,7 +63,6 @@
              curr-state
              [{:command ::c/move :team-name "1" :directions [::c/left ::c/down]}
               {:command ::c/move :team-name "1" :direction ::c/left}
-              {:command ::c/use :team-name "2" :item ::c/banana}
               {:command ::c/move :team-name "3" :direction ::c/right}
               {:command ::c/move :team-name "4" :direction ::c/right}
               {:command ::c/move :team-name "6" :direction ::c/up}])))))

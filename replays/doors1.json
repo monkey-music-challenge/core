@@ -1,0 +1,116 @@
+{
+  "level": "doors",
+  "teams": ["1", "2"],
+  "outcome": {
+    "isGameOver": false,
+    "teams": {
+      "2": {
+        "score": 16
+      }
+    }
+  },
+  "turns": [
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "up"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "right"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "right"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "down"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "down"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "down"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "left"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "down"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "down"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "down"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "left"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "down"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "down"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "right"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "right"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "right"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "up"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "up"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "left"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "right"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "up"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "left"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "right"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "up"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "up"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "left"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "left"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "up"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "up"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "up"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "left"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "left"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "left"}],
+
+    [{"team": "1", "command": "idle"},
+     {"team": "2", "command": "move", "direction": "down"}]
+  ]
+}

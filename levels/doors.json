@@ -2,30 +2,26 @@
   "turns": 100,
   "inventorySize": 4,
   "layout": [
-   "ass|         MU",
-   "###            ",
-   "    /          ",
-   "#.# ###-### #-#",
-   "s # #P   P# # s",
-   "# # ## / ## # #",
-   "a # #P   P# # a",
-   "# # ## / ## # #",
-   "s # #P   P# # s",
-   "#-# ###-### #.#",
-   "          /    ",
-   "            ###",
-   "UM         |ssa"                    
+   "a#      a#",
+   "s#mum#  #a",
+   "s#####  as",
+   "a# s#     ",
+   "sa    ##-#",
+   "### # #p p",
+   "as# / #p p",
+   "s # # ##-#",
+   "#        a",
+   "#u ###sas#"                    
   ],
   "legend": {
-    "|": "closed-door",
     "-": "closed-door",
-    ".": "open-door",
     "#": "wall",
     "s": "song",
     "a": "album",
     "p": "playlist",
-    "M": "monkey",
-    "U": "user",
+    "m": "monkey",
+    "u": "user",
+    " ": "empty",
     "/": "lever"
   }
 }

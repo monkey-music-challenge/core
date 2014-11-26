@@ -57,8 +57,6 @@
 (derive ::armed-trap ::layoutable)
 (derive ::monkey ::layoutable)
 
-; derive 10 tunnels
-(derive ::tunnel-0 ::tunnel)
 (derive ::tunnel-1 ::tunnel)
 (derive ::tunnel-2 ::tunnel)
 (derive ::tunnel-3 ::tunnel)
@@ -95,14 +93,12 @@
 
 (derive ::immobilized ::buff)
 (derive ::tackled ::immobilized)
-(derive ::asleep ::immobilized)
 (derive ::trapped ::immobilized)
 
 (def duration-of
-  {::speedy 3
-   ::tackled 1
-   ::asleep 1
-   ::trapped 1})
+  {::speedy 6
+   ::tackled 0 ; just until the end of the turn
+   ::trapped 6})
 
 (defn add-buff [state team-name buff]
   (assoc-in state [:teams team-name :buffs buff] (inc (duration-of buff))))
@@ -317,7 +313,6 @@
   [{:keys [layout teams random inventory-size] :as state}
    {:keys [team-name direction]}]
   (let [{:keys [to-position]} (peek-move state team-name direction)
-        push-successful (check-push-success! state)
         steal-successful (check-steal-success! state)
         push-to-position (translate to-position direction)
         enemy-team-name (team-at state to-position)
@@ -326,16 +321,12 @@
         enemy-inventory (get-in teams [enemy-team-name :inventory])
         item-to-steal (peek enemy-inventory)]
     (cond-> state
-      push-successful (add-buff enemy-team-name ::tackled)
-      (not push-successful) (add-buff team-name ::tackled)
-
-      (and push-successful (isa? unit-at-push-to-position ::movable-to))
+      (isa? unit-at-push-to-position ::movable-to)
       (-> (move-team enemy-team-name push-to-position)
           (move-team team-name to-position))
       
-      (and push-successful steal-successful item-to-steal
-           (< (count inventory) inventory-size))
-      (-> (update-in [:teams team-name :inventory] conj (peek enemy-inventory)) 
+      (and steal-successful item-to-steal (< (count inventory) inventory-size))
+      (-> (update-in [:teams team-name :inventory] conj item-to-steal) 
           (update-in [:teams enemy-team-name :inventory] pop)
           (update-in [:rendering-hints] conj (steal-hint item-to-steal
                                                          team-name
@@ -362,7 +353,7 @@
       (cond-> state
           team-name (update-in [:armed-trap-positions] #(remove #{trap-position} %))
           team-name (add-buff team-name ::trapped)
-          team-name (update-in [:animation-hints] conj (trigger-trap-hint team-name))
+          team-name (update-in [:rendering-hints] conj (trigger-trap-hint team-name))
           (pos? (count inventory)) (update-in [:teams team-name :inventory] pop))))
 
 (defn check-armed-traps [{:keys [armed-trap-positions] :as state}]
@@ -398,11 +389,6 @@
 (defn decrease-turns [state]
   (update-in state [:remaining-turns] dec))
 
-(defn sleep-all-absent-teams [{:keys [teams] :as state} commands]
-  (let [team-names (into #{} (map :team-name commands))
-        missing-team-names (remove team-names (keys teams))]
-    (reduce #(add-buff %1 %2 ::asleep) state missing-team-names)))
-
 (defn clear-rendering-hints [state]
   (assoc state :rendering-hints []))
 
@@ -413,6 +399,5 @@
       (arm-traps)
       (run-all-commands preprocessed-commands)
       (decrease-turns)
-      (sleep-all-absent-teams commands)
       (check-armed-traps)
       (tick-all-buffs))))

@@ -53,7 +53,7 @@
             (c/run-commands [{:command ::c/idle :team-name "1"}
                              {:command ::c/move :direction ::c/up :team-name "2"}]))]
     (are [x y] (= x y)
-         {::c/trapped 1} (get-in curr-state [:teams "2" :buffs])
+         {::c/trapped (c/duration-of ::c/trapped)} (get-in curr-state [:teams "2" :buffs])
          [] (:armed-trap-positions curr-state)
          [0 0] (get-in curr-state [:teams "2" :position])
          [] (get-in curr-state [:teams "2" :inventory]))))
@@ -70,7 +70,7 @@
             (c/run-commands [{:command ::c/idle :team-name "1"}
                              {:command ::c/move :direction ::c/up :team-name "2"}]))]
     (are [x y] (= x y)
-         {::c/trapped 1} (get-in curr-state [:teams "2" :buffs])
+         {::c/trapped (c/duration-of ::c/trapped)} (get-in curr-state [:teams "2" :buffs])
          [] (:armed-trap-positions curr-state)
          [0 0] (get-in curr-state [:teams "2" :position])
          [] (get-in curr-state [:teams "2" :inventory]))))
