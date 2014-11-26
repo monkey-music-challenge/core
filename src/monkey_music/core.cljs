@@ -181,8 +181,8 @@
      :random (random/create (seed level))
      :inventory-size inventory-size
      :remaining-turns turns
-     :trap-positions []
-     :armed-trap-positions []
+     :traps []
+     :armed-traps []
      :rendering-hints []
      :layout layout-without-unused-monkeys
      :base-layout (base-layout layout-without-unused-monkeys)}))
@@ -342,22 +342,23 @@
 
 ;; Traps
 
-(defn arm-traps [{:keys [trap-positions] :as state}]
+(defn arm-traps [{:keys [traps] :as state}]
   (-> state
-      (update-in [:armed-trap-positions] into trap-positions)
-      (assoc :trap-positions [])))
+      (update-in [:armed-traps] into traps)
+      (assoc :traps [])))
 
-(defn check-trap [{:keys [teams] :as state} trap-position]
-  (let [on-trap? (fn [[team-name team]] (= trap-position (:position team)))
-        [team-name {:keys [inventory]}] (find-first on-trap? teams)]
+(defn check-trap [{:keys [teams] :as state} {:keys [team-name position] :as trap}]
+  (let [on-trap? (fn [[curr-team-name team]] (and (= position (:position team))
+                                                  (not= team-name curr-team-name)))
+        [team-name-on-trap {:keys [inventory]}] (find-first on-trap? teams)]
       (cond-> state
-          team-name (update-in [:armed-trap-positions] #(remove #{trap-position} %))
-          team-name (add-buff team-name ::trapped)
-          team-name (update-in [:rendering-hints] conj (trigger-trap-hint team-name))
-          (pos? (count inventory)) (update-in [:teams team-name :inventory] pop))))
+          team-name-on-trap (update-in [:armed-traps] #(remove #{trap} %))
+          team-name-on-trap (add-buff team-name-on-trap ::trapped)
+          team-name-on-trap (update-in [:rendering-hints] conj (trigger-trap-hint team-name))
+          (pos? (count inventory)) (update-in [:teams team-name-on-trap :inventory] pop))))
 
-(defn check-armed-traps [{:keys [armed-trap-positions] :as state}]
-  (reduce check-trap state armed-trap-positions))
+(defn check-armed-traps [{:keys [armed-traps] :as state}]
+  (reduce check-trap state armed-traps))
 
 (defmethod run-command [::use ::trap]
   [{:keys [teams] :as state}
@@ -365,7 +366,7 @@
   (let [{:keys [inventory position]} (teams team-name)]
     (if (some #(isa? % ::trap) inventory)
       (-> state
-          (update-in [:trap-positions] conj position)
+          (update-in [:traps] conj {:team-name team-name :position position})
           (update-in [:teams team-name :inventory] remove-one ::trap))
       state)))
 

@@ -25,7 +25,7 @@
                                         {:command ::c/idle :team-name "2"}]))]
     (are [x y] (= x y)
          [] (get-in curr-state [:teams "1" :inventory])
-         [[0 0]] (:trap-positions curr-state))))
+         [{:team-name "1" :position [0 0]}] (:traps curr-state))))
 
 (deftest test-arm-trap
   (let [curr-state 
@@ -37,8 +37,8 @@
             (c/run-commands [{:command ::c/move :direction ::c/right :team-name "1"}
                              {:command ::c/move :direction ::c/right :team-name "2"}]))]
     (are [x y] (= x y)
-         [[0 0]] (:armed-trap-positions curr-state)
-         [] (:trap-positions curr-state)
+         [{:team-name "1" :position [0 0]}] (:armed-traps curr-state)
+         [] (:traps curr-state)
          [::c/song] (get-in curr-state [:teams "2" :inventory]))))
 
 (deftest test-trigger-trap
@@ -54,7 +54,7 @@
                              {:command ::c/move :direction ::c/up :team-name "2"}]))]
     (are [x y] (= x y)
          {::c/trapped (c/duration-of ::c/trapped)} (get-in curr-state [:teams "2" :buffs])
-         [] (:armed-trap-positions curr-state)
+         [] (:armed-traps curr-state)
          [0 0] (get-in curr-state [:teams "2" :position])
          [] (get-in curr-state [:teams "2" :inventory]))))
 
@@ -71,7 +71,7 @@
                              {:command ::c/move :direction ::c/up :team-name "2"}]))]
     (are [x y] (= x y)
          {::c/trapped (c/duration-of ::c/trapped)} (get-in curr-state [:teams "2" :buffs])
-         [] (:armed-trap-positions curr-state)
+         [] (:armed-traps curr-state)
          [0 0] (get-in curr-state [:teams "2" :position])
          [] (get-in curr-state [:teams "2" :inventory]))))
 

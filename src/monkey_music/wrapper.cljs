@@ -108,15 +108,18 @@
 (defn teams->json [teams]
   (into {} (for [[team-name team] teams] [team-name (team->json team)])))
 
+(defn trap->json [{:keys [team-name position]}]
+  {"team" team-name "position" position})
+
 (defn game-state->json-for-renderer
   [{:keys [layout base-layout inventory-size remaining-turns
-           teams rendering-hints trap-positions armed-trap-positions] :as state}]
+           teams rendering-hints traps armed-traps] :as state}]
   {"layout" (layout->json layout)
    "baseLayout" (layout->json base-layout)
    "teams" (teams->json teams)
    "inventorySize" inventory-size
-   "trapPositions" trap-positions
-   "armedTrapPositions" armed-trap-positions
+   "trapPositions" (map trap->json traps)
+   "armedTrapPositions" (map trap->json armed-traps)
    "remainingTurns" remaining-turns
    "isGameOver" (c/game-over? state)
    "renderingHints" (map hint->json rendering-hints)})
