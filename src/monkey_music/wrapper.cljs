@@ -118,8 +118,8 @@
    "baseLayout" (layout->json base-layout)
    "teams" (teams->json teams)
    "inventorySize" inventory-size
-   "trapPositions" (map trap->json traps)
-   "armedTrapPositions" (map trap->json armed-traps)
+   "traps" (map trap->json traps)
+   "armedTraps" (map trap->json armed-traps)
    "remainingTurns" remaining-turns
    "isGameOver" (c/game-over? state)
    "renderingHints" (map hint->json rendering-hints)})
