@@ -354,7 +354,7 @@
       (cond-> state
           team-name-on-trap (update-in [:armed-traps] #(remove #{trap} %))
           team-name-on-trap (add-buff team-name-on-trap ::trapped)
-          team-name-on-trap (update-in [:rendering-hints] conj (trigger-trap-hint team-name))
+          team-name-on-trap (update-in [:rendering-hints] conj (trigger-trap-hint team-name-on-trap))
           (pos? (count inventory)) (update-in [:teams team-name-on-trap :inventory] pop))))
 
 (defn check-armed-traps [{:keys [armed-traps] :as state}]

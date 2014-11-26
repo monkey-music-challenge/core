@@ -1,0 +1,30 @@
+{
+  "level": "traps",
+  "teams": ["1", "2"],
+  "outcome": {
+    "teams": {
+      "2": {
+        "buffs": {
+          "trapped": 6
+        }
+      }
+    }
+  },
+  "turns": [
+    [{"team": "1", "command": "move", "direction": "left"}],
+    [{"team": "1", "command": "move", "direction": "right"}],
+    [{"team": "1", "command": "move", "direction": "right"}],
+    [{"team": "1", "command": "move", "direction": "up"}],
+    [{"team": "1", "command": "move", "direction": "right"}],
+    [{"team": "1", "command": "move", "direction": "right"}],
+    [{"team": "1", "command": "move", "direction": "right"}],
+    [{"team": "1", "command": "use", "item": "trap"}],
+    [{"team": "1", "command": "move", "direction": "up"}],
+    [{"team": "1", "command": "move", "direction": "down"}],
+    [{"team": "1", "command": "move", "direction": "up"}],
+
+    [{"team": "2", "command": "move", "direction": "right"}],
+    [{"team": "2", "command": "move", "direction": "left"}],
+    [{"team": "2", "command": "move", "direction": "up"}]
+  ]
+}
