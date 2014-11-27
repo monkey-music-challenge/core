@@ -66,6 +66,11 @@
   {"hint" "trigger-trap"
    "team" team-name})
 
+(defmethod hint->json ::c/got-tackled
+  [{:keys [team-name]}]
+  {"hint" "got-tackled"
+   "team" team-name})
+
 (defmethod hint->json ::c/enter-tunnel
   [{:keys [item team-name from-position enter-position exit-position]}]
   {"hint" "enter-tunnel"

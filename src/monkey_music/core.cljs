@@ -13,12 +13,17 @@
 (derive ::move-team ::hint)
 (derive ::enter-tunnel ::hint)
 (derive ::trigger-trap ::hint)
+(derive ::got-tackled ::hint)
 
 (defn move-hint [team-name from-position to-position]
   {:hint ::move-team
    :team-name team-name
    :from-position from-position
    :to-position to-position})
+
+(defn tackle-hint [team-name]
+  {:hint ::got-tackled
+   :team-name team-name})
 
 (defn steal-hint [item from-team-name to-team-name]
   {:hint ::steal
@@ -321,6 +326,9 @@
         enemy-inventory (get-in teams [enemy-team-name :inventory])
         item-to-steal (peek enemy-inventory)]
     (cond-> state
+      true (-> (add-buff enemy-team-name ::tackled)
+               (update-in [:rendering-hints] conj (tackle-hint enemy-team-name)))
+
       (isa? unit-at-push-to-position ::movable-to)
       (-> (move-team enemy-team-name push-to-position)
           (move-team team-name to-position))
