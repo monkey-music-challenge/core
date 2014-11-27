@@ -1,0 +1,22 @@
+{
+  "inventorySize": 1,
+  "turns": 100,
+  "layout": [
+    "p 2#m",
+    "###u ",
+    "     ",
+    " 1###",
+    "m#1 2"
+  ],
+  "legend": {
+    "s": "song",
+    "a": "album",
+    "p": "playlist",
+    " ": "empty",
+    "u": "user",
+    "m": "monkey",
+    "1": "tunnel-1",
+    "2": "tunnel-2",
+    "#": "wall"
+  }
+}

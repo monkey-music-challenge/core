@@ -1,0 +1,22 @@
+{
+  "inventorySize": 1,
+  "turns": 100,
+  "layout": [
+    "/   a",
+    "##-##",
+    "/   m",
+    "  ###",
+    "m . a"
+  ],
+  "legend": {
+    "s": "song",
+    "a": "album",
+    "p": "playlist",
+    " ": "empty",
+    "m": "monkey",
+    "#": "wall",
+    "/": "lever",
+    "-": "closed-door",
+    ".": "open-door"
+  }
+}
