@@ -1,0 +1,38 @@
+{
+  "turns": 50,
+  "inventorySize": 5,
+  "layout": [
+    "u  s     s     a       u",
+    "                a       ",
+    "                        ",
+    " s               a      ",
+    "     p                  ",
+    "    a p       s     s   ",
+    "    s                   ",
+    "           p      sa    ",
+    "s        s              ",
+    "                     s  ",
+    "   a                    ",
+    "p      a   um  a       a",
+    "     p     mu     s   a ",
+    " s        p      s      ",
+    "      s   a s a     a   ",
+    "      p    s  a       s ",
+    "s        s              ",
+    "   a         s   a    a ",
+    "        p        s      ",
+    " s           a  as      ",
+    "    s       s           ",
+    "                        ",
+    "              a         ",
+    "u      s               u"
+  ],
+  "legend": {
+    "p": "playlist",
+    "a": "album",
+    "s": "song",
+    "m": "monkey",
+    "u": "user",
+    " ": "empty"
+  }
+}

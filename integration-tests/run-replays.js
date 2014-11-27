@@ -1,4 +1,4 @@
-var mm = require('../lib/debug');
+var mm = require('..');
 
 var repeat = require('mout/string/repeat');
 var assertPartialMatch = require('referee').assert.match;
@@ -30,7 +30,7 @@ suite('replays', function() {
   replayFiles.forEach(function(replayFile) {
     test(replayFile, function() {
       var replay = require(path.resolve(path.join('replays', replayFile)));
-      var level = require(path.resolve(path.join('levels', replay.level + '.json')));
+      var level = require(path.resolve(path.join('levels', replay.level)));
       var state = mm.createGameState(replay.teams, level);
       var reverseLegend = reverseLookup(level.legend);
       replay.turns.forEach(function(commands) {

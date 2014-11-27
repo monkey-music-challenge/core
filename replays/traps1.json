@@ -1,5 +1,5 @@
 {
-  "level": "traps",
+  "level": "boss/traps.json",
   "teams": ["1", "2"],
   "outcome": {
     "teams": {

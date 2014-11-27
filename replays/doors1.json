@@ -1,5 +1,5 @@
 {
-  "level": "doors",
+  "level": "boss/doors.json",
   "teams": ["1", "2"],
   "outcome": {
     "isGameOver": false,

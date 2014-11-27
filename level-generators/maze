@@ -1,0 +1,65 @@
+#!/usr/bin/env nodejs
+
+var amaze = require('./amaze');
+
+var choice = require('mout/random/choice');
+
+var size = parseInt(process.argv[2]);
+var iterations = parseInt(process.argv[3]);
+var initialP = parseFloat(process.argv[4]);
+
+if (!size || !iterations || !initialP) {
+  console.log('Usage: ./maze <size> <iterations> <initialP: (0.0, 1.0)>');
+  process.exit(1);
+}
+
+var maze = amaze(size / 2, size / 2).trim().split('\n').map(function(row) {
+  return row.split('');
+});
+
+var p = initialP;
+for (var i = 0; i < iterations; i++) {
+  for (var y = 0; y < size; y++) {
+    for (var x = 0; x < size; x++) {
+      var neighbors = [
+        (maze[y - 1] || [])[x],
+        (maze[y + 1] || [])[x],
+        (maze[y] || [])[x - 1],
+        (maze[y] || [])[x + 1]
+      ];
+      var numEmptyNeighbors = neighbors.filter(function(neighbor) {
+        return neighbor === ' ';
+      }).length;
+      var numEmptyOrSongNeighbors = neighbors.filter(function(neighbor) {
+        return neighbor === ' ' || neighbor === 's' || neighbor === 'a' || neighbor === 'p';
+      }).length;
+      var isAlley = numEmptyOrSongNeighbors === 1 && maze[y][x] === ' ';
+      var isAlmostAlley = numEmptyNeighbors === 1 && maze[y][x] === ' ';
+      if (isAlley) {
+        maze[y][x] = choice(['p', 'a', 's']);
+      } else if (isAlmostAlley && Math.random() < p) {
+        if (i < 2) {
+          maze[y][x] = choice(['p', 'a', 'a', 's', 's', 's']);
+        } else {
+          maze[y][x] = choice(['a', 's', 's', 's', 's']);
+        }
+      }
+    }
+  }
+  p = p / 2;
+}
+
+var level = {
+  'layout': maze.map(function(row, y) {
+    return row.join('');
+  }),
+  'legend': {
+    'p': 'playlist',
+    'a': 'album',
+    's': 'song',
+    ' ': 'empty',
+    '#': 'wall'
+  }
+};
+
+console.log(JSON.stringify(level, null, 2));

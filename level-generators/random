@@ -1,0 +1,32 @@
+#!/usr/bin/env nodejs
+
+var range = require('mout/array/range');
+var choice = require('mout/random/choice');
+
+var size = parseInt(process.argv[2]);
+var density = parseFloat(process.argv[3]);
+
+if (!size || !density) {
+  console.log('Usage: ./random <size> <density: (0.0, 1.0)>');
+  process.exit(1);
+}
+
+var level = {
+  'layout': range(0, size - 1).map(function(y) {
+    return range(0, size - 1).map(function(x) {
+      if (Math.random() < density) {
+        return choice(['p', 'a', 'a', 's', 's', 's', 's']);
+      } else {
+        return ' ';
+      }
+    }).join('');
+  }),
+  'legend': {
+    'p': 'playlist',
+    'a': 'album',
+    's': 'song',
+    ' ': 'empty'
+  }
+};
+
+console.log(JSON.stringify(level, null, 2));
