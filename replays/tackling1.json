@@ -1,0 +1,32 @@
+{
+  "level": "tackling",
+  "teams": ["1", "2"],
+  "outcome": {
+    "teams": {
+      "1": {
+        "score": 6
+      }
+    }
+  },
+  "turns": [
+    [{"team": "2", "command": "move", "direction": "down"}],
+    [{"team": "2", "command": "move", "direction": "left"}],
+    [{"team": "2", "command": "move", "direction": "down"}],
+    [{"team": "2", "command": "move", "direction": "up"}],
+    [{"team": "2", "command": "move", "direction": "up"}],
+    [{"team": "2", "command": "move", "direction": "up"}],
+    [{"team": "2", "command": "move", "direction": "up"}],
+
+    [{"team": "1", "command": "move", "direction": "left"}],
+    [{"team": "1", "command": "move", "direction": "down"}],
+    [{"team": "1", "command": "move", "direction": "down"}],
+    [{"team": "1", "command": "move", "direction": "down"}],
+    [{"team": "1", "command": "move", "direction": "down"}],
+    [{"team": "1", "command": "move", "direction": "up"}],
+    [{"team": "1", "command": "move", "direction": "up"}],
+    [{"team": "1", "command": "move", "direction": "up"}],
+    [{"team": "1", "command": "move", "direction": "up"}],
+    [{"team": "1", "command": "move", "direction": "up"}],
+    [{"team": "1", "command": "move", "direction": "right"}]
+  ]
+}

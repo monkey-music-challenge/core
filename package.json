@@ -10,7 +10,7 @@
     "doc": "doc"
   },
   "scripts": {
-    "test": "lein do cljsbuild clean, cljsbuild once, cljsbuild auto test",
+    "test": "lein do cljsbuild clean, cljsbuild once, cljsbuild auto",
     "prepublish": "lein do cljsbuild clean, cljsbuild once prod && ./node_modules/mocha/bin/mocha --opts integration-tests/mocha.opts"
   },
   "repository": {

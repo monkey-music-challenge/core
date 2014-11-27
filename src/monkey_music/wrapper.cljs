@@ -6,6 +6,7 @@
   (cond
     (nil? s) "<nil>"
     (= "" s) "<empty string>"
+    (= " " s) "<space>"
     :else s))
 
 (defn throw-error [& msgs]
@@ -21,10 +22,15 @@
       (throw-error "Unknown " (name entity) ": " s ". Known " (name entity) "s: "
                    (string/join ", " (map name (leaf-descendants entity))) "."))))
 
+(defn lookup-legend [legend token]
+  (if-let [entity-str (legend token)]
+    entity-str
+    (throw-error token " not in legend")))
+
 (defn json->layout [layout legend]
   (->> layout
        (mapv vec)
-       (mapv (partial mapv #(->> % (legend)
+       (mapv (partial mapv #(->> % (lookup-legend legend)
                                    (str->entity ::c/layoutable))))))
 
 (defn json->level [{:strs [legend turns layout inventorySize]}]

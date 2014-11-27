@@ -42,6 +42,14 @@
                           "u" "user"
                           " " "empty"}))))
 
+(deftest test-json->layout-with-missing-legend
+  (is (thrown? js/Error
+               (w/json->layout [" m"
+                                "su"]
+                               {"m" "monkey"
+                                "s" "song"
+                                "u" "user"}))))
+
 (deftest test-json->level
   (is (= (w/json->level {"legend" {"m" "monkey"
                                    "s" "song"
@@ -104,4 +112,4 @@
           "position" [1 1]
           "score" 0})))
 
-;(test-ns 'monkey-music.wrapper-test)
+(test-ns 'monkey-music.wrapper-test)

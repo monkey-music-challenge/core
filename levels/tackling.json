@@ -6,7 +6,7 @@
     "   M   ",
     "       ",
     "s     s",
-    "#     #",
+    "#  a  #",
     "a  #  a",
     "a# M #a",
     "PsaPasP"
@@ -17,6 +17,7 @@
     "#": "wall",
     "s": "song",
     "a": "album",
+    " ": "empty",
     "P": "playlist"
   }
 }
