@@ -253,11 +253,18 @@
                                                  at-position
                                                  to-position)))))
 
-(defn dispatch-command [state {:keys [command team-name direction item] :as command}]
-  (condp isa? command
-    ::move [::move (:to-unit (peek-move state team-name direction))]
-    ::use [::use item]
-    ::idle ::idle))
+(defn dispatch-command
+  [{:keys [teams] :as state}
+   {:keys [command team-name direction item] :as command}]
+  (cond
+    (or (isa? command ::idle) (some #(isa? % ::immobilized) (keys (:buffs (teams team-name)))))
+    ::idle
+
+    (isa? command ::move)
+    [::move (:to-unit (peek-move state team-name direction))]
+
+    (isa? command ::use)
+    [::use item]))
 
 (defmulti run-command dispatch-command)
 
