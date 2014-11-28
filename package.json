@@ -1,6 +1,6 @@
 {
   "name": "monkey-music",
-  "version": "0.22.0",
+  "version": "0.22.1",
   "description": "Monkey Music",
   "main": "lib/index.js",
   "author": "Oscar Söderlund",
