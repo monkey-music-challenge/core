@@ -115,7 +115,7 @@ would result in your monkey picking up the `song` to its right, as such.
 
 ~~~json
 {
-  "layout": [["empty", "monkey"]],
+  "layout": [["monkey", "empty"]],
   "position": [0, 0],
   "inventory": ["song"]
 }
