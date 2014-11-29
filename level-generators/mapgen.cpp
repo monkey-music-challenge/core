@@ -1,4 +1,4 @@
-# <höjd> <bredd> <flyttal: densitet väggar> <flyttal: densitet tracks>
+// <höjd> <bredd> <flyttal: densitet väggar> <flyttal: densitet tracks>
 
 #include <algorithm>
 #include <iostream>
