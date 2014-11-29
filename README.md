@@ -1,8 +1,8 @@
 # Monkey Music: Core
 
-Rule engine for [Monkey Music Challenge](http://monkeymusicchallenge.com).
+<img src="doc/img/monkey.png" align="right">
 
-## Introduction
+Rule engine for [Monkey Music Challenge](http://monkeymusicchallenge.com).
 
 Monkey Music Challenge is an AI- and pathfinding programming competition, where
 monkeys battle it out in a virtual 2D-djungle over who can collect the most
