@@ -1,6 +1,6 @@
 # Monkey Music: Core
 
-Game engine for (Monkey Music Challenge)[http://monkeymusicchallenge.com].
+Rule engine for [Monkey Music Challenge](http://monkeymusicchallenge.com).
 
 ## Introduction
 
