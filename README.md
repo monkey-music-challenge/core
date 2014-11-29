@@ -75,8 +75,9 @@ For example, in this scenario:
 
 ~~~json
 {
-  // ...
-  "layout": [["monkey", "empty"]]
+  "layout": [["monkey", "empty"]],
+
+  "...": "..."
 }
 ~~~
 
