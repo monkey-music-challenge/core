@@ -139,12 +139,69 @@ The `user` rewards the following points for different music items:
 * `album`: 2 points
 * `playlist`: 4 points
 
+For example, in this scenario:
+
+~~~json
+{
+  "layout": [["monkey", "user"]],
+  "position": [0, 0],
+  "inventory": ["song", "album", "playlist"],
+  "score": 0
+}
+~~~
+
+issuing the command:
+
+~~~json
+{"command": "move", "direction": "right"}
+~~~
+
+would result in your monkey trading in all currently carried music items for
+points, as such:
+
+~~~json
+{
+  "layout": [["monkey", "user"]],
+  "position": [0, 0],
+  "inventory": [],
+  "score": 7
+}
+~~~
+
+
 #### Tackling other monkeys
 
 If another `monkey` is in your way, you can tackle it! A tackled monkey will be
 unable to do anything else for the remainder of the turn, and you also have a
 50% chance of stealing something from your opponent's inventory. Watch out for
 thieves!
+
+For example, in this scenario, where your opponent's monkey stands at position `[0, 2]`:
+
+~~~json
+{
+  "layout": [["monkey", "monkey", "empty"]],
+  "position": [0, 0],
+  "inventory": []
+}
+~~~
+
+issuing the command:
+
+~~~json
+{"command": "move", "direction": "right"}
+~~~
+
+would (if you get to move before your opponent) result in your monkey tackling
+its opponent, and also (possibly) stealing one of its items, as such:
+
+~~~json
+{
+  "layout": [["empty", "monkey", "monkey"]],
+  "position": [0, 1],
+  "inventory": ["album"]
+}
+~~~
 
 #### Move order
 
@@ -158,22 +215,30 @@ program replied faster than your opponent's program, your `monkey` will have a
 The world is full of `open-door`s and `closed-door`s. They are controlled
 through interacting with `lever`s.
 
+<img src="doc/img/doors.png" width="300px">
+
 For example, in the following scenario:
 
 ~~~json
-{"todo": "todo"}
+{
+  "layout": [["open-door", "lever"],
+             ["closed-door", "monkey"]],
+  "position": [1, 1]
 ~~~
 
 issuing the command
 
 ~~~json
-{"command": "move", "direction": "left"}
+{"command": "move", "direction": "up"}
 ~~~
 
 Would open all the `closed-door`s and close all the `open-door`s:
 
 ~~~json
-{"todo": "todo"}
+{
+  "layout": [["closed-door", "lever"],
+             ["open-door", "monkey"]],
+  "position": [1, 1]
 ~~~
 
 #### Entering tunnels
