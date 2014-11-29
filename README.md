@@ -245,66 +245,159 @@ Would open all the `closed-door`s and close all the `open-door`s:
 
 #### Entering tunnels
 
-Tunnels connect different parts of the world with each other. Every `tunnel`
-has a number, such as `tunnel-1`, `tunnel-2` etc. There are always two of every
-tunnel on every level, and my moving inside a tunnel, your monkey will pop up
-at the other end.
+Tunnels connect different parts of the world with each other.
+
+<img src="doc/img/tunnels.png" width="300px">
+
+Every `tunnel` has a number, such as `tunnel-1`, `tunnel-2` etc. There are
+always two of every tunnel on every level, and my moving inside a tunnel, your
+monkey will pop up at the other end.
 
 For example, in the following scenario:
+
+~~~json
+{
+  "layout": [["tunnel-1", "monkey", "wall", "user"],
+             ["wall", "empty", "tunnel-1", "song"]],
+  "position": [0, 1]
+}
+~~~
 
 issuing the command:
 
 ~~~json
-{"command": "move", "direction": "right"}
+{"command": "move", "direction": "left"}
 ~~~
 
 would give the following outcome:
 
 ~~~json
-{"todo": "todo"}
+{
+  "layout": [["tunnel-1", "empty", "wall", "user"],
+             ["wall", "empty", "monkey", "song"]],
+  "position": [1, 2]
+}
 ~~~
+
+Note that your monkey cannot move into a tunnel if the exit is blocked by
+another monkey.
 
 ### Use
 
-Through the `use` command, your monkey can consume an item in its inventory.
+With the `use` command, your monkey can consume an item in its inventory.
+
+<img src="inventory.png" width="100px">
+
 There are 2 different types of items: `banana`s and `trap`s.
 
 #### Bananas
 
 Bananas give a positive `speedy` buff to your monkey.
 
-By picking up a `banana` and then issuing the following command:
+For example, in the following scenario:
+
+~~~json
+{
+  "layout": [["monkey", "empty", "song"]],
+  "position": [0, 0],
+  "inventory": ["banana"],
+  "buffs": {}
+}
+~~~
+
+issuing the command:
 
 ~~~json
 {"command": "use", "item": "banana"}
 ~~~
 
-your monkey will obtain a `speedy` buff for the 6 upcoming turns.
+would give the following outcome:
+
+~~~json
+{
+  "layout": [["monkey", "empty", "song"]],
+  "position": [0, 0],
+  "inventory": [],
+  "buffs": {"speedy": 6}
+}
+~~~
+
+By eating a `banana`, your monkey will obtain a `speedy` buff for the 6
+upcoming turns.
 
 While your monkey is `speedy`, you can make multiple moves per turn by sending
 `move` commands with an array of several directions, like this:
-
-A maximum of 2 moves per turn is allowed while `speedy`. Remember to use the
-`"directions"` argument instead of the singular `"direction"`!
 
 ~~~json
 {"command": "move", "directions": ["left", "up"]}
 ~~~
 
+which in the above scenario, would result in the following outcome:
+
+~~~json
+{
+  "layout": [["empty", "monkey", "empty"]],
+  "position": [0, 0],
+  "inventory": ["song"],
+  "buffs": {"speedy": 5}
+}
+~~~
+
+As we can see, the `monkey` made two moves, and the duration of the `speedy`
+buff was decreased by one turn.
+
+A maximum of 2 moves per turn is allowed while `speedy`. Remember to use the
+`"directions"` argument instead of the singular `"direction"`!
+
 #### Traps
 
 Traps are offensive items, that mess up the lives of your opponents.
 
-By picking up a `trap` and then issuing the following command:
+<img src="doc/img/traps.png" width="300px">
+
+Traps are initially not armed, they can be picked up by your `monkey`, as such:
 
 ~~~json
-{"command": "use", "item": "trap"}
+{
+  "layout": [["monkey", "trap", "monkey"]],
+  "position": [0, 0],
+  "inventory": []
+}
 ~~~
 
-your monkey will set a trap at its current position. Armed traps are invisible, and will not show up in the layout. Don't worry, you cannot fall victim to your own traps.
+~~~json
+{"command": "move", "direction": "right"}
+~~~
 
-When your opponent `move`s to the same position as your trap, it will be
-stunned for 6 turns, also possibly losing an item in its inventory.
+~~~json
+{
+  "layout": [["monkey", "empty", "monkey"]],
+  "position": [0, 0],
+  "inventory": ["trap"]
+}
+~~~
+
+You must then choose a strategic location to set your trap.. choose wisely!
+
+~~~json
+{"command": "move", "direction": "right"}
+{"command": "use", "item": "trap"}
+{"command": "move", "direction": "left"}
+~~~
+
+~~~json
+{
+  "layout": [["monkey", "empty", "monkey"]],
+  "position": [0, 0],
+  "inventory": []
+}
+~~~
+
+As we can see, armed traps are invisible to all players, but don't worry, you
+can't fall victim to your own traps!
+
+When your opponent `move`s to the same position as your trap, they will be
+stunned for 6 turns, also losing an item from its inventory. Moahaha!!
 
 ### Idle
 
