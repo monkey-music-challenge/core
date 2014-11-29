@@ -286,7 +286,7 @@ another monkey.
 
 With the `use` command, your monkey can consume an item in its inventory.
 
-<img src="inventory.png" width="100px">
+<img src="doc/img/inventory.png" width="100px">
 
 There are 2 different types of items: `banana`s and `trap`s.
 
