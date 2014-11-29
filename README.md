@@ -353,7 +353,7 @@ A maximum of 2 moves per turn is allowed while `speedy`. Remember to use the
 
 Traps are offensive items, that mess up the lives of your opponents.
 
-<img src="doc/img/traps.png" width="300px">
+<img src="doc/img/traps.png" width="400px">
 
 Traps are initially not armed, they can be picked up by your `monkey`, as such:
 
