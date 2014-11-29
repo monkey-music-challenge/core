@@ -125,7 +125,7 @@ Note that when picking up an item, your `monkey` remains at its current
 position.
 
 Items can only be picked up while your monkey's inventory is smaller than the
-`inventorySize` specified in the game state. If the inventory is full
+`inventorySize` specified in the game state. If the inventory is full, you will not be able to move to an item.
 
 #### Dropping off music items
 
