@@ -15,7 +15,7 @@ most points. Read on to find out more...
 
 Your the game takes place in a virtual 2D-world, looking something like this:
 
-<img src="doc/img/level.png" width="300px">
+<img src="doc/img/level.png" width="400px">
 
 Your program reads this 2D-world from a JSON object, which in the above case
 would look like this:
@@ -215,7 +215,7 @@ program replied faster than your opponent's program, your `monkey` will have a
 The world is full of `open-door`s and `closed-door`s. They are controlled
 through interacting with `lever`s.
 
-<img src="doc/img/doors.png" width="300px">
+<img src="doc/img/doors.png" width="400px">
 
 For example, in the following scenario:
 
@@ -247,7 +247,7 @@ Would open all the `closed-door`s and close all the `open-door`s:
 
 Tunnels connect different parts of the world with each other.
 
-<img src="doc/img/tunnels.png" width="300px">
+<img src="doc/img/tunnels.png" width="400px">
 
 Every `tunnel` has a number, such as `tunnel-1`, `tunnel-2` etc. There are
 always two of every tunnel on every level, and my moving inside a tunnel, your
@@ -286,7 +286,7 @@ another monkey.
 
 With the `use` command, your monkey can consume an item in its inventory.
 
-<img src="doc/img/inventory.png" width="100px">
+<img src="doc/img/inventory.png" width="200px">
 
 There are 2 different types of items: `banana`s and `trap`s.
 
