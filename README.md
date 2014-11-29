@@ -74,7 +74,10 @@ Your monkey can pick up items by moving to them.
 For example, in this scenario:
 
 ~~~json
-{"todo": "todo"}
+{
+  // ...
+  "layout": [["monkey", "empty"]]
+}
 ~~~
 
 issuing the command:
