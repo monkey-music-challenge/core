@@ -27,7 +27,7 @@ would look like this:
     ["empty", "song", "song", "song", "empty"],
     ["empty", "empty", "user", "empty", "empty"],
     ["empty", "wall", "playlist", "wall", "empty"],
-    ["empty", "monkey", "song", "monokey", "empty"]
+    ["empty", "monkey", "song", "monkey", "empty"]
   ],
   "remainingTurns": 10,
   "isGameOver": false,
