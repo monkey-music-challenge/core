@@ -7,6 +7,7 @@
   (catch js/Error e e))
 
 (set! *main-cli-fn* (fn []))
+(enable-console-print!)
 
 ;; Functions returning Clojure values
 
