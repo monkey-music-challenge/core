@@ -67,17 +67,12 @@ The following are valid move commands:
 The `move` command both moves your monkey around the world, and lets it
 interact with its surroundings.
 
-#### Picking up items
-
-Your monkey can pick up items by moving to them.
-
 For example, in this scenario:
 
 ~~~json
 {
   "layout": [["monkey", "empty"]],
-
-  "...": "..."
+  "position": [0, 0]
 }
 ~~~
 
@@ -87,12 +82,47 @@ issuing the command:
 {"command": "move", "direction": "right"}
 ~~~
 
-would result in your monkey picking up the item to its right, while remaining
-on its current position, as such:
+would result in your monkey moving one step to the right, as such:
 
 ~~~json
-{"todo": "todo"}
+{
+  "layout": [["empty", "monkey"]],
+  "position": [0, 1]
+}
 ~~~
+
+#### Picking up items
+
+Your monkey can pick up items by moving to them.
+
+For example, in this scenario:
+
+~~~json
+{
+  "layout": [["monkey", "song"]],
+  "position": [0, 0],
+  "inventory": []
+}
+~~~
+
+issuing the command:
+
+~~~json
+{"command": "move", "direction": "right"}
+~~~
+
+would result in your monkey picking up the `song` to its right, as such.
+
+~~~json
+{
+  "layout": [["empty", "monkey"]],
+  "position": [0, 0],
+  "inventory": ["song"]
+}
+~~~
+
+Note that when picking up an item, your `monkey` remains at its current
+position.
 
 Items can only be picked up while your monkey's inventory is smaller than the
 `inventorySize` specified in the game state. If the inventory is full
