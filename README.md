@@ -414,5 +414,7 @@ Copyright © 2014 Oscar Söderlund and Anton Lindgren.
 Distributed under the MIT License.
 
 Monkey designed by [Patrik Göthe](http://www.slashie.org).
+
 Overworld sprites by [Buch](http://blog-buch.rhcloud.com).
+
 Custom sprites by [Johan Brook](http://johanbrook.com).
