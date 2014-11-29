@@ -22,12 +22,18 @@ would look like this:
 
 ~~~json
 {
-  "layout": [[]],
+  "layout": [
+    ["album", "wall", "playlist", "wall", "album"],
+    ["empty", "song", "song", "song", "empty"],
+    ["empty", "empty", "user", "empty", "empty"],
+    ["empty", "wall", "playlist", "wall", "empty"],
+    ["empty", "monkey", "song", "monokey", "empty"]
+  ],
   "remainingTurns": 10,
   "isGameOver": false,
 
-  "score": 3,
-  "position": [0, 1],
+  "score": 0,
+  "position": [4, 1],
   "inventory": [],
   "inventorySize": 3,
   "buffs": {}
