@@ -224,6 +224,7 @@ For example, in the following scenario:
   "layout": [["open-door", "lever"],
              ["closed-door", "monkey"]],
   "position": [1, 1]
+}
 ~~~
 
 issuing the command
@@ -239,6 +240,7 @@ Would open all the `closed-door`s and close all the `open-door`s:
   "layout": [["closed-door", "lever"],
              ["open-door", "monkey"]],
   "position": [1, 1]
+}
 ~~~
 
 #### Entering tunnels
