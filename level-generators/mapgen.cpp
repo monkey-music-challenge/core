@@ -8,15 +8,15 @@
 #include <vector>
 #include <ctime>
 #include <queue>
- 
+
 using namespace std;
- 
+
 vector<string> map;
 int width, height;
- 
+
 int dr[4] = {0, 1, 0, -1};
 int dc[4] = {1, 0, -1, 0};
- 
+
 void printMap() {
     return;
     for (int i = 0; i < height; ++i) {
@@ -26,32 +26,32 @@ void printMap() {
         cout << endl;
     }
 }
- 
+
 void connectSquares(int r1, int c1, int r2, int c2) {
     //cout << "connecting (" << r1 << "," << c1 << ") and (" << r2 << "," << c2 << ")" << endl;
     pair<int,int> leftPoint, rightPoint;
     if (c1 < c2) {
-        leftPoint = make_pair(r1,c1);        
+        leftPoint = make_pair(r1,c1);
         rightPoint = make_pair(r2,c2);
     } else {
-        leftPoint = make_pair(r2,c2);        
+        leftPoint = make_pair(r2,c2);
         rightPoint = make_pair(r1,c1);
     }
- 
+
     int minRow = min(leftPoint.first, rightPoint.first);
     int maxRow = max(leftPoint.first, rightPoint.first);
- 
+
     for (int curC = leftPoint.second; curC <= rightPoint.second; ++curC) {
         map[leftPoint.first][curC] = ' ';
     }
- 
+
     for (int curR = minRow; curR <= maxRow; ++curR) {
         map[curR][rightPoint.second] = ' ';
     }
-   
+
     printMap();
 }
- 
+
 void makeSureThereIsAPathFrom0To1(vector<vector<int> > &ids) {
     vector<pair<int,int> > ones;
     vector<pair<int,int> > zeroes;
@@ -62,15 +62,15 @@ void makeSureThereIsAPathFrom0To1(vector<vector<int> > &ids) {
             else if (ids[i][j] == 1) ones.push_back(make_pair(i,j));
         }
     }
- 
+
     int besti, bestj;
     int min = 1<<30;
- 
+
     for (int i = 0; i < zeroes.size(); ++i) {
         for (int j = 0; j < ones.size(); ++j) {
             int dr = abs(zeroes[i].first-ones[j].first);
             int dc = abs(zeroes[i].second-ones[j].second);
- 
+
             if (dr + dc < min) {
                 besti = i;
                 bestj = j;
@@ -78,14 +78,14 @@ void makeSureThereIsAPathFrom0To1(vector<vector<int> > &ids) {
             }
         }
     }
- 
+
     connectSquares(zeroes[besti].first, zeroes[besti].second, ones[bestj].first, ones[bestj].second);
 }
- 
+
 void dfs(vector<vector<int> > &vis, int r, int c, int component) {
     if (!(r >= 0 && r < height && c >= 0 && c < width))
         return;
- 
+
     if (map[r][c] == '#') return;
     if (vis[r][c] != -1) return;
     vis[r][c] = component;
@@ -93,10 +93,10 @@ void dfs(vector<vector<int> > &vis, int r, int c, int component) {
         dfs(vis, r + dr[i], c + dc[i], component);
     }
 }
- 
+
 vector<vector<int> > partitionMap() {
     vector<vector<int> > vis(map.size(), vector<int>(map[0].size(), -1));
-   
+
     int numComponents = 0;
     for (int i = 0; i < map.size(); ++i) {
         for (int j = 0; j < map[i].size(); ++j) {
@@ -106,21 +106,28 @@ vector<vector<int> > partitionMap() {
             }
         }
     }
- 
+
     return vis;
 }
- 
+
+char musicItems[] = {'p', 'p', 'a', 'a', 'a', 's', 's', 's', 's'};
+
+char genRandomMusicItem() {
+  int r = rand() % (sizeof(musicItems)/sizeof(*musicItems));
+  return musicItems[r];
+}
+
 int main() {
     srand(time(0));
- 
+
     cin >> width >> height;
     double density;
     cin >> density;
     double densityTracks;
     cin >> densityTracks;
- 
+
     map.resize(height);
-   
+
     for (int i = 0; i < height; ++i) {
         string mapRow;
         for (int j = 0; j < width; ++j) {
@@ -136,18 +143,18 @@ int main() {
         }
         map[i] = mapRow;
     }
- 
+
     // remove random box on right edge (to make mirroring connected)
     int rRow = rand() % height;
     map[rRow][width-2] = ' ';
     map[rRow][width-1] = ' ';
-   
+
     rRow = rand() % height;
     map[rRow][width-1] = ' ';
- 
+
     for (;;) {
         vector<vector<int> > mapPartition = partitionMap();
- 
+
         int check = 0;
         for (int i = 0; i < mapPartition.size(); ++i) {
             for (int j = 0; j < mapPartition[i].size(); ++j) {
@@ -156,25 +163,25 @@ int main() {
             }
             //cout << endl;
         }
- 
+
         if (check == 0) break;
- 
+
         // make sure there is a path from 0 to 1
         makeSureThereIsAPathFrom0To1(mapPartition);
     }
-   
+
     vector<int> uCandidates;
     for (int i = 0; i < height; ++i) {
         if (map[i][width-1] == ' ') {
             uCandidates.push_back(i);
         }
     }
- 
+
     random_shuffle(uCandidates.begin(), uCandidates.end());
-   
-    map[uCandidates[0]][width-1] = 'U';
-    map[uCandidates[0]][width-2] = '1';
- 
+
+    map[uCandidates[0]][width-1] = 'u';
+    map[uCandidates[0]][width-2] = 'm';
+
     // place tracks
     vector<pair<int,int> > pCandidates;
     for (int i = 0; i < height; ++i) {
@@ -184,23 +191,20 @@ int main() {
             }
         }
     }
- 
+
     random_shuffle(pCandidates.begin(), pCandidates.end());
- 
+
     int nTracks = int(densityTracks * pCandidates.size());
- 
+
     for (int i = 0; i < nTracks; ++i) {
-        char type = 'a' + (rand()%5);
-        map[pCandidates[i].first][ pCandidates[i].second] = type;
+        map[pCandidates[i].first][ pCandidates[i].second] = genRandomMusicItem();
     }
- 
+
     for (int i = 0; i < height; ++i) {
         string rowcp = map[i];
         reverse(rowcp.begin(), rowcp.end());
         cout << map[i];
         for (int i = 1; i < rowcp.size(); ++i) {
-            if (rowcp[i] == '1') cout << 2;
-            else
             cout << rowcp[i];
         }
         cout << endl;
