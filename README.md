@@ -15,9 +15,7 @@ most points. Read on to find out more...
 
 Your the game takes place in a virtual 2D-world, looking something like this:
 
-~~~json
-{"todo": "todo"}
-~~~
+<img src="doc/img/level.png" width="300px">
 
 Your program reads this 2D-world from a JSON object, which in the above case
 would look like this:
