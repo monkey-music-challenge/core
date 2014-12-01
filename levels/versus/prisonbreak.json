@@ -1,6 +1,6 @@
 {
   "inventorySize": 4,
-  "turns": "180",
+  "turns": 180,
   "legend": {
     " ": "empty",
     "m": "monkey",
