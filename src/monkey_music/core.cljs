@@ -291,7 +291,7 @@
         total-value (reduce + (map value-of valuables))]
     (-> state
         (update-in [:teams team-name :score] + total-value)
-        (assoc-in [:teams team-name :inventory] non-valuables))))
+        (assoc-in [:teams team-name :inventory] (into [] non-valuables)))))
 
 (defn find-first [pred coll] (first (filter pred coll)))
 
