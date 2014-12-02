@@ -60,4 +60,35 @@
          [1 1] (get-in curr-state [:teams "2" :position])
          [1 2] (get-in curr-state [:teams "3" :position])))))
 
-;(test-ns 'monkey-music.tackle-test)
+(deftest test-tackle-without-move-without-steal
+  (with-redefs [c/check-steal-success! (constantly false)]
+    (let [curr-state
+        (-> state
+            ; team 2 tackles team 3
+            (c/run-commands [{:team-name "1" :command ::c/idle}
+                             {:team-name "2" :command ::c/move :direction ::c/right}
+                             {:team-name "3" :command ::c/idle}]))]
+    (are [x y] (= x y)
+         [1 1] (get-in curr-state [:teams "2" :position])
+         [1 2] (get-in curr-state [:teams "3" :position])))))
+
+(def tackle-state
+  (c/create-game-state
+    ["1" "2"]
+    {:layout [[::c/empty ::c/monkey ::c/monkey ::c/empty ::c/song]]
+     :turns 10
+     :inventory-size 3}))
+
+(deftest test-simulaneous-tackle
+  (with-redefs [c/weighted-shuffle!
+                (constantly [{:team-name "1" :command ::c/move :direction ::c/right}
+                             {:team-name "2" :command ::c/move :direction ::c/left}])]
+    (let [curr-state
+          (-> tackle-state
+              (c/run-commands [{:team-name "1" :command ::c/move :direction ::c/right}
+                               {:team-name "2" :command ::c/move :direction ::c/left}]))]
+      (are [x y] (= x y)
+           [0 2] (get-in curr-state [:teams "1" :position])
+           [0 3] (get-in curr-state [:teams "2" :position])))))
+
+(test-ns 'monkey-music.tackle-test)
