@@ -100,15 +100,21 @@
 (defn create-game-state [team-names json-level]
   (c/create-game-state team-names (json->level json-level)))
 
+(defn unbuffed-directions->direction
+  [{:keys [teams] :as state}
+   {:keys [team-name command directions] :as original-command}]
+  (if (and (isa? command ::c/move)
+           (not (contains? (:buffs (teams team-name)) ::c/speedy))
+           (not (empty? directions)))
+    {:command ::c/move :team-name team-name :direction (first directions)}
+    original-command))
+
 (defn validate-command
-  [{:keys [teams]}
+  [{:keys [teams] :as state}
    {:keys [team-name] :as command}]
   (when-not (some (partial = team-name) (keys teams))
     (throw-error "team not part of game: " team-name))
-  (when (isa? (:command command) ::c/move)
-    (when (and (:directions command) (not (get-in (teams team-name) [:buffs ::c/speedy])))
-      (throw-error "can only make multiple moves with speedy buff")))
-  command)
+  (unbuffed-directions->direction state command))
 
 (defn parse-command [state command]
   (validate-command state (json->command command)))
