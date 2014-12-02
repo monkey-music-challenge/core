@@ -75,4 +75,4 @@
          [0 0] (get-in curr-state [:teams "2" :position])
          [] (get-in curr-state [:teams "2" :inventory]))))
 
-(test-ns 'monkey-music.traps-test)
+;(test-ns 'monkey-music.traps-test)

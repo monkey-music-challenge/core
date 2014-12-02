@@ -12,8 +12,8 @@
 (def state
   (c/create-game-state
     ["1"]
-    {:layout [[::c/monkey ::c/banana ::c/empty ::c/song]
-             [::c/user ::c/album ::c/empty ::c/wall]]
+    {:layout [[::c/monkey ::c/banana ::c/empty ::c/song ::c/song]
+              [::c/user ::c/album ::c/empty ::c/wall ::c/song]]
      :inventory-size 3
      :turns 10}))
 
@@ -29,7 +29,7 @@
   (let [curr-state (-> state
                        (c/run-commands [{:command ::c/move :direction ::c/right :team-name "1"}])
                        (c/run-commands [{:command ::c/use :item ::c/banana :team-name "1"}]))]
-    (is (= {::c/speedy 3} (get-in curr-state [:teams "1" :buffs])))))
+    (is (= {::c/speedy 6} (get-in curr-state [:teams "1" :buffs])))))
 
 (deftest move-speedily
   (let [curr-state (-> state
@@ -38,15 +38,18 @@
                        (c/run-commands [{:command ::c/move :directions [::c/right ::c/right ::c/right] :team-name "1"}]))]
     (is (= [0 2] (get-in curr-state [:teams "1" :position])))))
 
-(deftest move-speedily-thrice-then-buff-disappears
+(deftest move-speedily-then-buff-disappears
   (let [curr-state (-> state
                        (c/run-commands [{:command ::c/move :direction ::c/right :team-name "1"}])
                        (c/run-commands [{:command ::c/use :item ::c/banana :team-name "1"}])
                        (c/run-commands [{:command ::c/move :directions [::c/right ::c/right] :team-name "1"}])
                        (c/run-commands [{:command ::c/move :directions [::c/right ::c/down] :team-name "1"}])
+                       (c/run-commands [{:command ::c/move :directions [::c/left ::c/left] :team-name "1"}])
+                       (c/run-commands [{:command ::c/move :directions [::c/left ::c/left] :team-name "1"}])
+                       (c/run-commands [{:command ::c/move :directions [::c/left ::c/left] :team-name "1"}])
                        (c/run-commands [{:command ::c/move :directions [::c/left ::c/left] :team-name "1"}]))]
     (are [x y] (= x y)
-         [::c/song ::c/album] (get-in curr-state [:teams "1" :inventory])
+         [] (get-in curr-state [:teams "1" :inventory])
          [1 1] (get-in curr-state [:teams "1" :position])
          {} (get-in curr-state [:teams "1" :buffs]))))
 

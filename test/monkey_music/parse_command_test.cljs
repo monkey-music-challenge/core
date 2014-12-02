@@ -24,11 +24,10 @@
                                                 "team" "3"}))))
 
 (deftest test-parse-directions-when-not-speedy
-  (is (thrown? js/Error
-               (w/parse-command state {"command" "move"
-                                       "directions" ["left" "right"]
-                                       "team" "1"}))))
-
+  (is (= {:command ::c/move :team-name "1" :direction ::c/left}
+         (w/parse-command state {"command" "move"
+                                 "directions" ["left" "right"]
+                                 "team" "1"}))))
 
 (deftest test-parse-directions-when-not-speedy
   (is (= {:command ::c/move :directions [::c/left ::c/right] :team-name "1"}

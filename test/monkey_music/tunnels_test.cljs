@@ -6,8 +6,8 @@
 (def state
   (c/create-game-state
     ["1"]
-    {:layout [[::c/monkey ::c/tunnel-1 ::c/tunnel-2]
-              [::c/tunnel-2 ::c/empty ::c/tunnel-1]]
+    {:layout [[::c/monkey ::c/tunnel-1 ::c/tunnel-2 ::c/song]
+              [::c/tunnel-2 ::c/empty ::c/tunnel-1 ::c/song]]
      :turns 10
      :inventory-size 3}))
 
@@ -33,7 +33,7 @@
             (c/run-commands [{:command ::c/move :direction ::c/right :team-name "1"}]))]
     (are [x y] (= x y)
          [1 0] (get-in curr-state [:teams "1" :position])
-         [[::c/empty ::c/tunnel-1 ::c/tunnel-2]
-          [::c/monkey ::c/empty ::c/tunnel-1]] (:layout curr-state))))
+         [[::c/empty ::c/tunnel-1 ::c/tunnel-2 ::c/song]
+          [::c/monkey ::c/empty ::c/tunnel-1 ::c/song]] (:layout curr-state))))
 
 ;(test-ns 'monkey-music.tunnels-test)

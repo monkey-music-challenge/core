@@ -409,11 +409,13 @@
   (assoc state :rendering-hints []))
 
 (defn run-commands [state commands]
-  (let [preprocessed-commands (preprocess-commands state commands)]
-    (-> state
-      (clear-rendering-hints)
-      (arm-traps)
-      (run-all-commands preprocessed-commands)
-      (decrease-turns)
-      (check-armed-traps)
-      (tick-all-buffs))))
+  (if-not (game-over? state)
+    (let [preprocessed-commands (preprocess-commands state commands)]
+      (-> state
+        (clear-rendering-hints)
+        (arm-traps)
+        (run-all-commands preprocessed-commands)
+        (decrease-turns)
+        (check-armed-traps)
+        (tick-all-buffs)))
+    state))
