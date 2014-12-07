@@ -1,0 +1,42 @@
+{
+  "inventorySize": 3,
+  "turns": 100,
+  "legend": {
+    " ": "empty",
+    "m": "monkey",
+    "#": "wall",
+    "s": "song",
+    "p": "playlist",
+    "a": "album",
+    "u": "user",
+    "1": "tunnel-1",
+    "2": "tunnel-2",
+    "3": "tunnel-3",
+    "4": "tunnel-4",
+    "5": "tunnel-5",
+    "6": "tunnel-6",
+    "7": "tunnel-7",
+    "8": "tunnel-8",
+    "9": "tunnel-9",
+    "-": "closed-door",
+    "|": "closed-door",
+    "_": "open-door",
+    "t": "trap",
+    "b": "banana",
+    "/": "lever"
+  },
+  "layout": [
+    "bs#pp  pp#sb",
+    "1          2",
+    "####s  s####",
+    "bb        bb",
+    "tttt    tttt",
+    "#####  #####",
+    "2          1",
+    "  ##a  a##  ",
+    "p  t#  #t  p",
+    "u  #b  b#  u",
+    "/-#b#  #b#-/",
+    "m          m"
+  ]
+}
