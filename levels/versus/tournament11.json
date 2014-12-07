@@ -26,20 +26,20 @@
     "/": "lever"
   },
   "layout": [
-    "ts#b#sa#a # a t",
-    "    #  t##   p#",
-    "a #   ###a ss b",
-    " #a ##b   s # #",
-    "# ##ss#    # aa",
+    "ts#b#s##a # a t",
+    "ppsb# #t##b  p#",
+    "pss   # /a ss b",
+    "paa   #   s # #",
+    "#####-#      aa",
     " s #    u##t #s",
-    "# #a #     #p  ",
-    "#p#t   ##a #   ",
-    "a    ##t  b#s# ",
-    "b s  #s   ##  a",
+    "# #a #    s#p  ",
+    "#p#t   #  a#   ",
+    "a   p##t  b#s# ",
+    "b s p#s   ##  a",
     "###### #s  t#  ",
     "m  1#1#   ##  ",
     "s   # #   #b #",
-    "p   # ## #t# s",
-    "upsm#      pp "
+    "p   # #  #t# s",
+    "upsm#      ppp"
   ]
 }
